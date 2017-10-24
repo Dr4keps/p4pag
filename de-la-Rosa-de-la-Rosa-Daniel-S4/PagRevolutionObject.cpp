@@ -20,8 +20,8 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	float a;
 
 	//PRIMER PUNTO.
-	//Si tiene tapa abajo, el primer punto que añadimos es ese, con normal (0, -1, 0)
-	//y tangente (-1, 0, 0). Lo hacemos directamente.
+	//Si tiene tapa abajo, el primer punto que añadimos es ese, con normal (0, -1, 0),
+	//tangente (-1, 0, 0) y coord. de textura (0.5, 0.5). Lo hacemos directamente.
 	if (sp.hasBottomFan()) {
 		PagPosNorm ppn;
 		ppn.position = glm::vec3(0, pt.y, 0);
@@ -29,6 +29,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 		pos_norm_bottom_fan.push_back(ppn);
 		tangents_bottom_fan.push_back(glm::vec3(-1, 0, 0));
+		texcoord_bottom_fan.push_back(glm::vec2(0.5, 0.5));
 	}
 	else {
 		//Aunque no tenga tapa de abajo, el primer punto es un caso especial
@@ -52,13 +53,18 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			glm::vec3 np(v.x * cos(a * glm::pi<float>() / 180.0f), v.y, -v.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 tg(-sin(a * glm::pi<float>() / 180.0f), 0, -cos(a * glm::pi<float>() / 180.0f));
 
-			//Almacenamos
+			//Calculamos la coordenada de textura.
+			float text_u = s / (float)slices;
+			//float text_v =
+
+			//Almacenamos. 
 			PagPosNorm ppn;
 			ppn.position = p;
 			ppn.normal = np;
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
+			//texcoord_body.push_back(glm::vec2(text_u, text_v));
 		}
 	}
 
