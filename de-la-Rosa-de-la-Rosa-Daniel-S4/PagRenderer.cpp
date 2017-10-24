@@ -74,18 +74,22 @@ void PagRenderer::prepareOpenGL()
 {
 	std::vector<glm::vec2> generatriz;
 	glm::vec2 p1(0, 0);
-	glm::vec2 p2(1, 1);
-	glm::vec2 p3(2, 2);
-	glm::vec2 p4(3, 3);
+	glm::vec2 p2(1, 0);
+	glm::vec2 p3(1, 2);
+	glm::vec2 p4(2, 3);
 	//algo
 	generatriz.push_back(p1);
 	generatriz.push_back(p2);
 	generatriz.push_back(p3);
 	generatriz.push_back(p4);
 
-	PagRevolutionObject ro(generatriz, 2, 10);
-	ro.getPositionsAndNormals(PAG_BOTTOM_FAN);
-	ro.getPositionsAndNormals(PAG_BODY);
+	PagRevolutionObject ro(generatriz, 0, 4);
+	//std::cout << "Tapa inferior" << std::endl;
+	//ro.getPositionsAndNormals(PAG_BOTTOM_FAN);
+	//std::cout << "Cuerpo" << std::endl;
+	//ro.getPositionsAndNormals(PAG_BODY);
+
+	ro.getTangents(PAG_BOTTOM_FAN);
 
 }
 

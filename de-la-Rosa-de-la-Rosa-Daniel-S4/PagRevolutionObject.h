@@ -34,7 +34,7 @@ private:
 
 	std::vector<glm::vec2> texcoord_body;
 	std::vector<glm::vec2> texcoord_bottom_fan;
-	std::vector<glm::vec3> texcoord_top_fan;
+	std::vector<glm::vec2> texcoord_top_fan;
 
 };
 

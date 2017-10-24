@@ -55,7 +55,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			//Calculamos la coordenada de textura.
 			float text_u = s / (float)slices;
-			//float text_v =
+			float text_v = 0;
 
 			//Almacenamos. 
 			PagPosNorm ppn;
@@ -98,7 +98,8 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			glm::vec3 p(pt.x * cos(a * glm::pi<float>() / 180.0f), pt.y, -pt.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 np(v.x * cos(a * glm::pi<float>() / 180.0f), v.y, -v.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 tg(-sin(a * glm::pi<float>() / 180.0f), 0, -cos(a * glm::pi<float>() / 180.0f));
-
+			float text_u;
+			float text_v;
 			//Almacenamos
 			PagPosNorm ppn;
 			ppn.position = p;
@@ -106,16 +107,24 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
+			
 
 			//Si es el segundo punto y tiene tapa de abajo, este punto también pertenece a ella.
 			if ((i == 1) && (sp.hasBottomFan())) {
 				pos_norm_bottom_fan.push_back(ppn);
 				tangents_bottom_fan.push_back(tg);
+				//Calculamos su coordenada de textura de la tapa.
+				text_u = (cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
+				text_v = (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
+				texcoord_bottom_fan.push_back(glm::vec2(text_u, text_v));
 			}
 			//Si es el penúltimo punto y tiene tapa de arriba, este punto también pertenece a ella.
 			if ((i == profile_pts.size() - 2) && (sp.hasTopFan())){
 				pos_norm_top_fan.push_back(ppn);
 				tangents_top_fan.push_back(tg);
+				text_u = (cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
+				text_v = (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
+				texcoord_top_fan.push_back(glm::vec2(text_u, text_v));
 			}
 		}
 	}
@@ -131,6 +140,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 		pos_norm_top_fan.push_back(ppn);
 		tangents_top_fan.push_back(glm::vec3(0, 0, -1));
+		texcoord_top_fan.push_back(glm::vec2(0.5, 0.5));
 	}
 	else {
 		//Aunque no tenga tapa de arriba, el último punto es un caso especial
@@ -198,16 +208,24 @@ PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
 	if ((part == PAG_BODY) && (sp.hasBody())) {
 		for (int i = 0; i < pos_norm_body.size(); i++) {
 			std::cout << "Posición (" << pos_norm_body[i].position.x << ", " << pos_norm_body[i].position.y << ", " << pos_norm_body[i].position.z << ")." << std::endl;
-			std::cout << "Normal (" << pos_norm_body[i].normal.x << ", " << pos_norm_body[i].normal.y << ", " << pos_norm_body[i].normal.z << ")." << std::endl;
+			std::cout << "Normal (" << pos_norm_body[i].normal.x << ", " << pos_norm_body[i].normal.y << ", " << pos_norm_body[i].normal.z << ").\n" << std::endl;
 		}
 		return pos_norm_body.data();
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
+		for (int i = 0; i < pos_norm_top_fan.size(); i++) {
+			std::cout << "Posición (" << pos_norm_top_fan[i].position.x << ", " << pos_norm_top_fan[i].position.y << ", " << pos_norm_top_fan[i].position.z << ")." << std::endl;
+			std::cout << "Normal (" << pos_norm_top_fan[i].normal.x << ", " << pos_norm_top_fan[i].normal.y << ", " << pos_norm_top_fan[i].normal.z << ").\n" << std::endl;
+		}
 		return pos_norm_top_fan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
+		for (int i = 0; i < pos_norm_bottom_fan.size(); i++) {
+			std::cout << "Posición (" << pos_norm_bottom_fan[i].position.x << ", " << pos_norm_bottom_fan[i].position.y << ", " << pos_norm_bottom_fan[i].position.z << ")." << std::endl;
+			std::cout << "Normal (" << pos_norm_bottom_fan[i].normal.x << ", " << pos_norm_bottom_fan[i].normal.y << ", " << pos_norm_bottom_fan[i].normal.z << ").\n" << std::endl;
+		}
 		return pos_norm_bottom_fan.data();
 	}
 
@@ -221,14 +239,23 @@ glm::vec3 * PagRevolutionObject::getTangents(PagRevObjParts part)
 	bool has_part = false;
 
 	if ((part == PAG_BODY) && (sp.hasBody())) {
+		for (int i = 0; i < texcoord_body.size(); i++) {
+			std::cout << "Coord. textura: (" << texcoord_body[i].x << ", " << texcoord_body[i].y << ")" << std::endl;
+		}
 		return tangents_body.data();
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
+		for (int i = 0; i < texcoord_top_fan.size(); i++) {
+			std::cout << "Coord. textura: (" << texcoord_top_fan[i].x << ", " << texcoord_top_fan[i].y << ")" << std::endl;
+		}
 		return tangents_top_fan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
+		for (int i = 0; i < texcoord_bottom_fan.size(); i++) {
+			std::cout << "Coord. textura: (" << texcoord_bottom_fan[i].x << ", " << texcoord_bottom_fan[i].y << ")" << std::endl;
+		}
 		return tangents_bottom_fan.data();
 	}
 
