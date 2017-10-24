@@ -64,7 +64,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
-			//texcoord_body.push_back(glm::vec2(text_u, text_v));
+			texcoord_body.push_back(glm::vec2(text_u, text_v));
 		}
 	}
 
@@ -165,6 +165,8 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			glm::vec3 p(pt.x * cos(a * glm::pi<float>() / 180.0f), pt.y, -pt.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 np(v.x * cos(a * glm::pi<float>() / 180.0f), v.y, -v.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 tg(-sin(a * glm::pi<float>() / 180.0f), 0, -cos(a * glm::pi<float>() / 180.0f));
+			float text_u = s / (float)slices;
+			//float text_v = 0;
 
 			//Almacenamos
 			PagPosNorm ppn;
@@ -173,6 +175,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
+			//texcoord_body.push_back(glm::vec2(text_u, text_v));
 		}
 	}
 
