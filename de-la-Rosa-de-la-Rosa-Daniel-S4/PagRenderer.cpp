@@ -77,7 +77,7 @@ void PagRenderer::prepareOpenGL()
 	glm::vec2 p2(1, 1);
 	glm::vec2 p3(2, 2);
 	glm::vec2 p4(3, 3);
-
+	//algo
 	generatriz.push_back(p1);
 	generatriz.push_back(p2);
 	generatriz.push_back(p3);
