@@ -13,11 +13,16 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	//Tomamos los puntos finales del perfil de subdvisión.
 	auto profile_pts = this->sp.getPoints();
 
-	//Tomamos el primer punto.
+	//Tomamos el primer punto del perfil y el último para calcular la distancia entre ellos
+	//para la coordenada 'v' de textura.
 	glm::vec2 pt = profile_pts[0];
+	glm::vec2 lastpt = profile_pts[profile_pts.size() - 1];
+	glm::vec2 v_pt_lpt = lastpt - pt;
+	float dist_firstpt_lastpt = sqrt(pow((v_pt_lpt.x), 2) + pow((v_pt_lpt.y), 2));
 
 	float delta = 360.0f / slices;
 	float a;
+	float mod_accumulated = 0; //Para la coordenada 'v' de textura.
 
 	//PRIMER PUNTO.
 	//Si tiene tapa abajo, el primer punto que añadimos es ese, con normal (0, -1, 0),
