@@ -84,12 +84,10 @@ void PagRenderer::prepareOpenGL()
 	generatriz.push_back(p4);
 
 	PagRevolutionObject ro(generatriz, 0, 4);
-	//std::cout << "Tapa inferior" << std::endl;
-	//ro.getPositionsAndNormals(PAG_BOTTOM_FAN);
-	//std::cout << "Cuerpo" << std::endl;
-	//ro.getPositionsAndNormals(PAG_BODY);
-
-	ro.getTangents(PAG_BOTTOM_FAN);
+	std::cout << "Cuerpo" << std::endl;
+	ro.getPositionsAndNormals(PAG_BODY);
+	std::cout << "iCuerpo" << std::endl;
+	ro.getIndices4PointCloud(PAG_BOTTOM_FAN);
 
 }
 

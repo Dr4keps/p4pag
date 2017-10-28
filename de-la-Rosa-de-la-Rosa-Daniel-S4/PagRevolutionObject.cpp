@@ -13,22 +13,17 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	//Tomamos los puntos finales del perfil de subdvisión.
 	auto profile_pts = this->sp.getPoints();
 
-	//Tomamos el primer punto del perfil y el último para calcular la distancia entre ellos
-	//para la coordenada 'v' de textura.
-	glm::vec2 pt = profile_pts[0];
-	glm::vec2 lastpt = profile_pts[profile_pts.size() - 1];
-	glm::vec2 v_pt_lpt = lastpt - pt;
-	float dist_firstpt_lastpt = sqrt(pow((v_pt_lpt.x), 2) + pow((v_pt_lpt.y), 2));
+	auto pt = profile_pts[0];
 
 	float delta = 360.0f / slices;
 	float a;
-	float mod_accumulated = 0; //Para la coordenada 'v' de textura.
+	float mod_accum = 0; //Para la coordenada 'v' de textura.
+	PagPosNorm ppn;
 
 	//PRIMER PUNTO.
 	//Si tiene tapa abajo, el primer punto que añadimos es ese, con normal (0, -1, 0),
 	//tangente (-1, 0, 0) y coord. de textura (0.5, 0.5). Lo hacemos directamente.
 	if (sp.hasBottomFan()) {
-		PagPosNorm ppn;
 		ppn.position = glm::vec3(0, pt.y, 0);
 		ppn.normal = glm::vec3(0, -1, 0);
 
@@ -63,7 +58,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			float text_v = 0;
 
 			//Almacenamos. 
-			PagPosNorm ppn;
 			ppn.position = p;
 			ppn.normal = np;
 
@@ -75,7 +69,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 
 	//CASO GENERAL. (Cuerpo).
-	//Desde el segundo punto hasta el penúltimo. (El último también es especial).
+	//Desde el segundo punto hasta el penúltimo.
 	//Para cada punto, para cada corte longitudinal...
 	for (int i = 1; i < profile_pts.size() - 1; i++) {
 		//Obtenemos el punto y calculamos la normal a partir de sus dos vecinos.
@@ -106,7 +100,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			float text_u;
 			float text_v;
 			//Almacenamos
-			PagPosNorm ppn;
 			ppn.position = p;
 			ppn.normal = np;
 
@@ -139,7 +132,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	//Si tiene tapa arriba, el punto que añadimos es ese, con normal (0, 1, 0)
 	//y tangente (0, 0, -1). Lo hacemos directamente.
 	if (sp.hasTopFan()) {
-		PagPosNorm ppn;
 		ppn.position = glm::vec3(0, pt.y, 0);
 		ppn.normal = glm::vec3(0, 1, 0);
 
@@ -174,7 +166,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			//float text_v = 0;
 
 			//Almacenamos
-			PagPosNorm ppn;
 			ppn.position = p;
 			ppn.normal = np;
 
@@ -185,12 +176,48 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	}
 
 
+
+	this->createTopology4PointCloud();
+
+
 }
 
 
 PagRevolutionObject::~PagRevolutionObject()
 {
 }
+
+
+void PagRevolutionObject::createTopology4PointCloud() {
+
+	if (sp.hasBottomFan()) {
+		//Se añaden todos menos el último que es repetido.
+		for (int i = 0; i < pos_norm_bottom_fan.size() - 1; i++) {
+			i4PointCloud_bottomFan.push_back(i);
+		}
+	}
+
+	if (sp.hasTopFan()) {
+		//Se añaden todos menos el primero que es repetido.
+		for (int i = 1; i < pos_norm_top_fan.size(); i++) {
+			i4PointCloud_topFan.push_back(i);
+		}
+	}
+
+	if (sp.hasBody()) {
+		for (int i = 1; i < pos_norm_body.size(); i++) {
+			if (!(i % (slices + 1) == 0)) {
+				i4PointCloud_body.push_back(i);
+			}
+		}
+	}
+}
+
+
+void PagRevolutionObject::createTopology4TriangleMesh() {
+
+}
+
 
 bool PagRevolutionObject::isValid()
 {
@@ -240,31 +267,84 @@ PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
 	return nullptr;
 }
 
+//Devuelve un array de C++ con las tangentes de los puntos correspondientes
+//a la parte que se le pasa.
 glm::vec3 * PagRevolutionObject::getTangents(PagRevObjParts part)
 {
-	int index_begin = 0;
-	int index_end = pos_norm_body.size() - 1;
-	bool has_part = false;
+
+	if ((part == PAG_BODY) && (sp.hasBody())) {
+		return tangents_body.data();
+	}
+
+	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
+		return tangents_top_fan.data();
+	}
+
+	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
+		return tangents_bottom_fan.data();
+	}
+
+	return nullptr;
+}
+
+//Devuelve un array de C++ con las coordenadas de textura de cada vértice
+//de la parte del objeto que se pasa como argumento. 
+glm::vec2 * PagRevolutionObject::getTextureCoords(PagRevObjParts part)
+{
 
 	if ((part == PAG_BODY) && (sp.hasBody())) {
 		for (int i = 0; i < texcoord_body.size(); i++) {
 			std::cout << "Coord. textura: (" << texcoord_body[i].x << ", " << texcoord_body[i].y << ")" << std::endl;
 		}
-		return tangents_body.data();
+		return texcoord_body.data();
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
 		for (int i = 0; i < texcoord_top_fan.size(); i++) {
 			std::cout << "Coord. textura: (" << texcoord_top_fan[i].x << ", " << texcoord_top_fan[i].y << ")" << std::endl;
 		}
-		return tangents_top_fan.data();
+		return texcoord_top_fan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
 		for (int i = 0; i < texcoord_bottom_fan.size(); i++) {
 			std::cout << "Coord. textura: (" << texcoord_bottom_fan[i].x << ", " << texcoord_bottom_fan[i].y << ")" << std::endl;
 		}
-		return tangents_bottom_fan.data();
+		return texcoord_bottom_fan.data();
+	}
+
+	return nullptr;
+}
+
+
+GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
+{
+
+	if ((part == PAG_BODY) && (sp.hasBody())) {
+		std::cout << "Indices4PointCloud cuerpo: " << std::endl;
+		for (int i = 0; i < i4PointCloud_body.size(); i++) {
+			std::cout << "- " << i4PointCloud_body[i] << " -" << std::endl;
+		}
+		
+		return i4PointCloud_body.data();
+	}
+
+	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
+		std::cout << "Indices4PointCloud tapa arriba: " << std::endl;
+		for (int i = 0; i < i4PointCloud_topFan.size(); i++) {
+			std::cout << "- " << i4PointCloud_topFan[i] << " -" << std::endl;
+		}
+
+		return i4PointCloud_topFan.data();
+	}
+
+	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
+		std::cout << "Indices4PointCloud tapa abajo: " << std::endl;
+		for (int i = 0; i < i4PointCloud_bottomFan.size(); i++) {
+			std::cout << "- " << i4PointCloud_bottomFan[i] << " -" << std::endl;
+		}
+
+		return i4PointCloud_bottomFan.data();
 	}
 
 	return nullptr;

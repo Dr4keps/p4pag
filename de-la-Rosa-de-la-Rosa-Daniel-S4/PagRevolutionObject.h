@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+#include <GL/GL.h>
 #include <glm.hpp>
 #include <vector>
 #include <iostream>
@@ -18,8 +20,13 @@ public:
 	bool has(PagRevObjParts part);
 	struct PagPosNorm* getPositionsAndNormals(PagRevObjParts part);
 	glm::vec3* getTangents(PagRevObjParts part);
+	glm::vec2* getTextureCoords(PagRevObjParts part);
+	GLuint* getIndices4PointCloud(PagRevObjParts part);
 
 private:
+	void createTopology4PointCloud();
+	void createTopology4TriangleMesh();
+
 	PagSubdivisionProfile sp;
 	unsigned int subdivisions;
 	unsigned int slices;
@@ -35,6 +42,10 @@ private:
 	std::vector<glm::vec2> texcoord_body;
 	std::vector<glm::vec2> texcoord_bottom_fan;
 	std::vector<glm::vec2> texcoord_top_fan;
+
+	std::vector<GLuint> i4PointCloud_bottomFan;
+	std::vector<GLuint> i4PointCloud_body;
+	std::vector<GLuint> i4PointCloud_topFan;
 
 };
 
