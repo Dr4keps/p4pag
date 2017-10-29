@@ -13,14 +13,27 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	//Tomamos los puntos finales del perfil de subdvisión.
 	auto profile_pts = this->sp.getPoints();
 
-	auto pt = profile_pts[0];
+	glm::vec2 pt;
+	//Para la coordenada 'v' de textura.
+	float mod_accum = 0;
+	float mod_total = 0;
+
+	//Primer procesamiento para calcular la suma de los módulos de los 
+	//vectores entre el primer punto y el último.
+	for (int i = 0; i < profile_pts.size() - 1; i++) {
+		pt = profile_pts[i];
+		auto nextpt = profile_pts[i+1];
+		auto vi = nextpt - pt;
+		mod_total += sqrt((pow(vi.x, 2)) + pow(vi.y, 2));
+	}
 
 	float delta = 360.0f / slices;
 	float a;
-	float mod_accum = 0; //Para la coordenada 'v' de textura.
 	PagPosNorm ppn;
 
 	//PRIMER PUNTO.
+	pt = profile_pts[0];
+
 	//Si tiene tapa abajo, el primer punto que añadimos es ese, con normal (0, -1, 0),
 	//tangente (-1, 0, 0) y coord. de textura (0.5, 0.5). Lo hacemos directamente.
 	if (sp.hasBottomFan()) {
@@ -55,7 +68,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			//Calculamos la coordenada de textura.
 			float text_u = s / (float)slices;
-			float text_v = 0;
 
 			//Almacenamos. 
 			ppn.position = p;
@@ -63,7 +75,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
-			texcoord_body.push_back(glm::vec2(text_u, text_v));
+			texcoord_body.push_back(glm::vec2(text_u, 0.0f));
 		}
 	}
 
@@ -76,18 +88,27 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 		pt = profile_pts[i];
 		glm::vec2 top_pt = profile_pts.at(i + 1);
 		glm::vec2 bottom_pt = profile_pts.at(i - 1);
+
 		//Calculamos el vector que va desde el punto hasta su vecino superior
-		//y desde el vecino inferior hasta el punto y los giramos 90 grados.
+		//y desde el vecino inferior hasta el punto.
 		glm::vec2 v1 = pt - bottom_pt;
 		glm::vec2 v2 = top_pt - pt;
+
+		//Calculamos coord. 'v' de textura.
+		//Calculamos modulo y lo sumamos a mod_accum.
+		mod_accum += sqrt((pow(v1.x, 2)) + pow(v1.y, 2));
+		//Dividimos mod_accum entre mod_total.
+		float text_v = mod_accum / mod_total;
+
+		//Calculamos normal
 		v1 = glm::vec2(v1.y, -v1.x);
 		v2 = glm::vec2(v2.y, -v2.x);
 		v1 = v1 / (sqrt(v1.x*v1.x + v1.y*v1.y));
 		v2 = v2 / (sqrt(v2.x*v2.x + v2.y*v2.y));
 		//Aplicamos la fórmula para hallar la normal.
-		glm::vec2 v = (v1 + v2) / 2.0f;
+		glm::vec2 vn = (v1 + v2) / 2.0f;
 		//Normalizamos.
-		v = v / (sqrt(v.x*v.x + v.y*v.y));
+		vn = vn / (sqrt(vn.x*vn.x + vn.y*vn.y));
 
 		for (int s = 0; s <= slices; s++) {
 			//Calculamos el ángulo a.
@@ -95,34 +116,33 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			//Calculamos el punto haciendo la revolución y su normal de la misma forma.
 			//Además, calculamos la tangente.
 			glm::vec3 p(pt.x * cos(a * glm::pi<float>() / 180.0f), pt.y, -pt.x * sin(a * glm::pi<float>() / 180.0f));
-			glm::vec3 np(v.x * cos(a * glm::pi<float>() / 180.0f), v.y, -v.x * sin(a * glm::pi<float>() / 180.0f));
+			glm::vec3 np(vn.x * cos(a * glm::pi<float>() / 180.0f), vn.y, -vn.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 tg(-sin(a * glm::pi<float>() / 180.0f), 0, -cos(a * glm::pi<float>() / 180.0f));
-			float text_u;
-			float text_v;
+			glm::vec2 tc(s / (float)slices, text_v);
+			
 			//Almacenamos
 			ppn.position = p;
 			ppn.normal = np;
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
-			
+			texcoord_body.push_back(tc);
 
 			//Si es el segundo punto y tiene tapa de abajo, este punto también pertenece a ella.
 			if ((i == 1) && (sp.hasBottomFan())) {
 				pos_norm_bottom_fan.push_back(ppn);
 				tangents_bottom_fan.push_back(tg);
 				//Calculamos su coordenada de textura de la tapa.
-				text_u = (cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
-				text_v = (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
-				texcoord_bottom_fan.push_back(glm::vec2(text_u, text_v));
+				glm::vec2 fan_tc((cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f, (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f);
+				texcoord_bottom_fan.push_back(fan_tc);
 			}
 			//Si es el penúltimo punto y tiene tapa de arriba, este punto también pertenece a ella.
 			if ((i == profile_pts.size() - 2) && (sp.hasTopFan())){
 				pos_norm_top_fan.push_back(ppn);
 				tangents_top_fan.push_back(tg);
-				text_u = (cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
-				text_v = (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f;
-				texcoord_top_fan.push_back(glm::vec2(text_u, text_v));
+				//Calculamos su coordenada de textura de la tapa.
+				glm::vec2 fan_tc((cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f, (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f);
+				texcoord_top_fan.push_back(fan_tc);
 			}
 		}
 	}
@@ -145,12 +165,11 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 		pt = profile_pts[profile_pts.size() - 1];
 
 		for (int s = 0; s <= slices; s++) {
-			//Calculamos la normal del punto.
 			//Tomamos el vecino de abajo.
 			glm::vec2 bottom_pt = profile_pts.at(profile_pts.size() - 2);
 			//Calculamos el vector que va desde el vecino inferior hasta el punto.
 			glm::vec2 v = pt - bottom_pt;
-			//Lo hacemos unitario.
+			//Hacemos el vector unitario.
 			v = v / (sqrt(v.x*v.x + v.y*v.y));
 			//Giramos 90 grados y obtenemos el vector normal.
 			v = glm::vec2(v.y, -v.x);
@@ -163,7 +182,6 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 			glm::vec3 np(v.x * cos(a * glm::pi<float>() / 180.0f), v.y, -v.x * sin(a * glm::pi<float>() / 180.0f));
 			glm::vec3 tg(-sin(a * glm::pi<float>() / 180.0f), 0, -cos(a * glm::pi<float>() / 180.0f));
 			float text_u = s / (float)slices;
-			//float text_v = 0;
 
 			//Almacenamos
 			ppn.position = p;
@@ -171,7 +189,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			pos_norm_body.push_back(ppn);
 			tangents_body.push_back(tg);
-			//texcoord_body.push_back(glm::vec2(text_u, text_v));
+			texcoord_body.push_back(glm::vec2(text_u, 1.0f));
 		}
 	}
 
@@ -187,7 +205,7 @@ PagRevolutionObject::~PagRevolutionObject()
 {
 }
 
-
+//Rellena los vectores de índices para dibujar como nube de puntos
 void PagRevolutionObject::createTopology4PointCloud() {
 
 	if (sp.hasBottomFan()) {
@@ -205,6 +223,7 @@ void PagRevolutionObject::createTopology4PointCloud() {
 	}
 
 	if (sp.hasBody()) {
+		//Añade todos menos los que se repiten
 		for (int i = 1; i < pos_norm_body.size(); i++) {
 			if (!(i % (slices + 1) == 0)) {
 				i4PointCloud_body.push_back(i);

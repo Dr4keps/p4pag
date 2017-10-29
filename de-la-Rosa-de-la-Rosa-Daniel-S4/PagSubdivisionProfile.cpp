@@ -29,7 +29,7 @@ PagSubdivisionProfile::PagSubdivisionProfile(std::vector<glm::vec2> points)
 		this->topFan = true;
 	}
 
-	//Procesamos los puntos que quedan. Desde el primero (inferiores) hasta el superior.
+	//Procesamos los puntos que quedan.
 	for (int i = 0; i <= j; i++) {
 		p = points[i];
 		if (equalZeroE(p.x)) {
@@ -42,7 +42,6 @@ PagSubdivisionProfile::PagSubdivisionProfile(std::vector<glm::vec2> points)
 			}
 		}
 		else if (p.x > 0) {
-			//Si la coordenada x es mayor que 0, es valida.
 			validPoints.push_back(p);
 		}
 	}
