@@ -155,12 +155,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PagRenderer.cpp" />
     <ClCompile Include="PagRevolutionObject.cpp" />
+    <ClCompile Include="PagShaderProgram.cpp" />
     <ClCompile Include="PagSubdivisionProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PagEnumerations.h" />
     <ClInclude Include="PagRenderer.h" />
     <ClInclude Include="PagRevolutionObject.h" />
+    <ClInclude Include="PagShaderProgram.h" />
     <ClInclude Include="PagStructures.h" />
     <ClInclude Include="PagSubdivisionProfile.h" />
   </ItemGroup>
