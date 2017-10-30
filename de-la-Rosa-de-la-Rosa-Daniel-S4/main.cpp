@@ -118,6 +118,9 @@ int main() {
 	// No tiene por qué ejecutarse en cada paso por el ciclo de eventos.
 	glClearColor(0.6, 0.6, 0.6, 1.0);
 
+	// - Llamamos al método prepareOpenGL de PagRenderer para que prepare la escena.
+	PagRenderer::getInstance()->prepareOpenGL();
+
 	// - Ciclo de eventos de la aplicación. La condición de parada es que la
 	// ventana principal deba cerrarse, por ejemplo, si el usuario pulsa el
 	// botón de cerrar la ventana (la X).

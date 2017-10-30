@@ -30,6 +30,9 @@ PagRenderer* PagRenderer::getInstance() {
 
 void PagRenderer::refreshCallback() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	pointShader.use();
+
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 }
 
@@ -70,6 +73,7 @@ void PagRenderer::scrollCallback(double xoffset, double yoffset)
 
 }
 
+// - Prepara la escena para su visualización. Solo se llama una única vez.
 void PagRenderer::prepareOpenGL()
 {
 	std::vector<glm::vec2> generatriz;
@@ -84,9 +88,11 @@ void PagRenderer::prepareOpenGL()
 	generatriz.push_back(p4);
 
 	PagRevolutionObject ro(generatriz, 0, 4);
-	std::cout << "Bottom fan" << std::endl;
-	ro.getTextureCoords(PAG_BODY);
+	//std::cout << "Bottom fan" << std::endl;
+	//ro.getTextureCoords(PAG_BODY);
 	std::cout << "iCuerpo" << std::endl;
+
+	pointShader.createShaderProgram("pointShader");
 
 }
 

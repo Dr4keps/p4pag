@@ -166,6 +166,10 @@
     <ClInclude Include="PagStructures.h" />
     <ClInclude Include="PagSubdivisionProfile.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="pointShader-frag.glsl" />
+    <None Include="pointShader-vert.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
