@@ -32,61 +32,78 @@ PagRenderer* PagRenderer::getInstance() {
 
 void PagRenderer::refreshCallback() {
 
+	std::cout << "Inicio" << std::endl;
+
+	std::vector<glm::vec2> generatriz;
+	glm::vec2 p1(0, 0);
+	glm::vec2 p2(1, 0);
+	glm::vec2 p3(1, 2);
+	glm::vec2 p4(2, 3);
+
+	//glm::vec2 p1(0, 0);
+	//glm::vec2 p2(1, 1);
+	//glm::vec2 p3(2, 2);
+	//glm::vec2 p4(3, 3);
+
+	generatriz.push_back(p1);
+	generatriz.push_back(p2);
+	generatriz.push_back(p3);
+	generatriz.push_back(p4);
+
+	PagRevolutionObject revolutionObj(generatriz, 0, 2);
+
+
 	//BORRAR
-	/*glm::vec3 points[] = { glm::vec3(-1.0, -1.0, 0.0),
-		glm::vec3(1.0, -1.0, 0.0),
-		glm::vec3(-1.0, 1.0, 0.0),
-		glm::vec3(1.0, 1.0, 0.0)
-	};
+	//glm::vec3 points[] = { glm::vec3(-1.0, -1.0, 0.0),
+	//	glm::vec3(1.0, -1.0, 0.0),
+	//	glm::vec3(-1.0, 1.0, 0.0),
+	//	glm::vec3(1.0, 1.0, 0.0)
+	//};
 
-	GLuint indices[] = { 0, 1, 2, 3 };
+	//GLuint indices[] = { 0, 1, 2, 3 };
 
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	//GLuint vao;
+	//glGenVertexArrays(1, &vao);
+	//glBindVertexArray(vao);
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//GLuint vbo;
+	//glGenBuffers(1, &vbo);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, sizeof(glm::vec3) / sizeof(GLfloat), GL_FLOAT, GL_FALSE, sizeof(glm::vec3), ((GLubyte *)NULL + (0)));
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, sizeof(glm::vec3) / sizeof(GLfloat), GL_FLOAT, GL_FALSE, sizeof(glm::vec3), ((GLubyte *)NULL + (0)));
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 
-	GLuint ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-		GL_STATIC_DRAW);*/
+	//GLuint ibo;
+	//glGenBuffers(1, &ibo);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+	//	GL_STATIC_DRAW);
 
 	//
-	/*glClearColor(1.0f, 1.0f, 1.0f, 1.0f);*/
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	/*glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 
-	glBindVertexArray(vao);*/
+	//glBindVertexArray(vao);
 	
-	auto perspective = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 50.0f);
+	auto perspective = glm::perspective(glm::radians(90.0f), 4.0f/3.0f, 0.1f, 500.0f);
 	auto vision = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 modeling(
-		glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), 
-		glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), 
-		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 
-		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) 
-	);
 
-	auto mvp = perspective * vision * modeling;
+	auto vp = perspective * vision;
 
 	pointShader.use();
-	pointShader.setUniform("pointSize", 7.0f);
+	pointShader.setUniform("pointSize", 5.0f);
 	pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	pointShader.setUniform("mModelViewProj", mvp);
+	pointShader.setUniform("mModelViewProj", vp);
 
 	/*glDrawElements(GL_POINTS, sizeof(indices) / sizeof(GLuint),
 		GL_UNSIGNED_INT, NULL);*/
+
+	revolutionObj.drawAsPointCloud(PAG_BODY);
 
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 }
@@ -129,18 +146,11 @@ void PagRenderer::scrollCallback(double xoffset, double yoffset)
 // - Prepara la escena para su visualización. Solo se llama una única vez.
 void PagRenderer::prepareOpenGL()
 {
-	std::vector<glm::vec2> generatriz;
-	glm::vec2 p1(0, 0);
-	glm::vec2 p2(1, 0);
-	glm::vec2 p3(1, 2);
-	glm::vec2 p4(2, 3);
-
-	generatriz.push_back(p1);
-	generatriz.push_back(p2);
-	generatriz.push_back(p3);
-	generatriz.push_back(p4);
-
-	PagRevolutionObject ro(generatriz, 0, 4);
+	
+	//std::cout << "Tapa abajo: " << std::endl;
+	//ro.getIndices4PointCloud(PAG_BOTTOM_FAN);
+	//std::cout << "Cuerpo: " << std::endl;
+	//ro.getIndices4PointCloud(PAG_BODY);
 
 	pointShader.createShaderProgram("pointShader");
 	

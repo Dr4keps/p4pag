@@ -195,7 +195,10 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 	this->createTopology4PointCloud();
 
-	PagVAO vaoBody;
+	std::cout << "createVBO: " << vaoBody.createVBOPosNorm() << std::endl;
+	std::cout << "createIBO4PointCloud: " << vaoBody.createIBO4PointCloud() << std::endl;
+	std::cout << "fillVBO: " << vaoBody.fillVBOPosNorm(pos_norm_body) << std::endl;
+	std::cout << "fillIBO4PointCloud: " << vaoBody.fillIBO4PointCloud(i4PointCloud_body) << std::endl;
 
 }
 
@@ -237,26 +240,24 @@ void PagRevolutionObject::createTopology4TriangleMesh() {
 	auto puntosPerfil = sp.getPoints().size();
 
 	if (sp.hasBottomFan()) {
-		//Se añaden todos menos el último que es repetido.
 		for (int i = 0; i < pos_norm_bottom_fan.size() - 1; i++) {
 			i4PointCloud_bottomFan.push_back(i);
 		}
 	}
 
 	if (sp.hasTopFan()) {
-		//Se añaden todos menos el primero que es repetido.
 		for (int i = 1; i < pos_norm_top_fan.size(); i++) {
 			i4PointCloud_topFan.push_back(i);
 		}
 	}
 
 	if (sp.hasBody()) {
-		//Añade todos menos los que se repiten
 		for (int s = 0; s < this->slices; s++) {
 			for (int i = 0; i < puntosPerfil; i++) {
 				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s);
 				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s + 1);
 			}
+			i4TriangleMesh_body.push_back(0xFFFF);
 		}
 	}
 
@@ -286,24 +287,24 @@ PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
 {
 	if ((part == PAG_BODY) && (sp.hasBody())) {
 		for (int i = 0; i < pos_norm_body.size(); i++) {
-			std::cout << "Posición (" << pos_norm_body[i].position.x << ", " << pos_norm_body[i].position.y << ", " << pos_norm_body[i].position.z << ")." << std::endl;
-			std::cout << "Normal (" << pos_norm_body[i].normal.x << ", " << pos_norm_body[i].normal.y << ", " << pos_norm_body[i].normal.z << ").\n" << std::endl;
+			std::cout <<i<<" -> " <<"Posición (" << pos_norm_body[i].position.x << ", " << pos_norm_body[i].position.y << ", " << pos_norm_body[i].position.z << "). ";
+			std::cout << "Normal (" << pos_norm_body[i].normal.x << ", " << pos_norm_body[i].normal.y << ", " << pos_norm_body[i].normal.z << ")." << std::endl;
 		}
 		return pos_norm_body.data();
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
 		for (int i = 0; i < pos_norm_top_fan.size(); i++) {
-			std::cout << "Posición (" << pos_norm_top_fan[i].position.x << ", " << pos_norm_top_fan[i].position.y << ", " << pos_norm_top_fan[i].position.z << ")." << std::endl;
-			std::cout << "Normal (" << pos_norm_top_fan[i].normal.x << ", " << pos_norm_top_fan[i].normal.y << ", " << pos_norm_top_fan[i].normal.z << ").\n" << std::endl;
+			std::cout << i << " -> " << "Posición (" << pos_norm_top_fan[i].position.x << ", " << pos_norm_top_fan[i].position.y << ", " << pos_norm_top_fan[i].position.z << "). ";
+			std::cout << "Normal (" << pos_norm_top_fan[i].normal.x << ", " << pos_norm_top_fan[i].normal.y << ", " << pos_norm_top_fan[i].normal.z << ")." << std::endl;
 		}
 		return pos_norm_top_fan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
 		for (int i = 0; i < pos_norm_bottom_fan.size(); i++) {
-			std::cout << "Posición (" << pos_norm_bottom_fan[i].position.x << ", " << pos_norm_bottom_fan[i].position.y << ", " << pos_norm_bottom_fan[i].position.z << ")." << std::endl;
-			std::cout << "Normal (" << pos_norm_bottom_fan[i].normal.x << ", " << pos_norm_bottom_fan[i].normal.y << ", " << pos_norm_bottom_fan[i].normal.z << ").\n" << std::endl;
+			std::cout << i << " -> " << "Posición (" << pos_norm_bottom_fan[i].position.x << ", " << pos_norm_bottom_fan[i].position.y << ", " << pos_norm_bottom_fan[i].position.z << "). ";
+			std::cout << "Normal (" << pos_norm_bottom_fan[i].normal.x << ", " << pos_norm_bottom_fan[i].normal.y << ", " << pos_norm_bottom_fan[i].normal.z << ")." << std::endl;;
 		}
 		return pos_norm_bottom_fan.data();
 	}
@@ -392,4 +393,9 @@ GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
 	}
 
 	return nullptr;
+}
+
+
+void PagRevolutionObject::drawAsPointCloud(PagRevObjParts part) {
+	vaoBody.drawAsPointCloud();
 }

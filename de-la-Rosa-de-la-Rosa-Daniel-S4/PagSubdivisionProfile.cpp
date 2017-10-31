@@ -55,7 +55,7 @@ PagSubdivisionProfile::PagSubdivisionProfile(std::vector<glm::vec2> points)
 	if (validPoints.size() >= 2) {
 		this->valid = true;
 
-		if (validPoints.size() > 3) {
+		if ( (validPoints.size() >= 4) || ( (validPoints.size() == 3) && (!topFan) ) ) {
 			this->body = true;
 		}
 	}

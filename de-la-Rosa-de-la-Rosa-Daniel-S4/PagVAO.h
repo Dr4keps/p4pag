@@ -20,10 +20,15 @@ public:
 	bool fillVBOTangents();
 	bool fillVBOTexCoord();
 
-	bool createIBOCloudPoint();
+	bool createIBO4PointCloud();
+
+	bool fillIBO4PointCloud(std::vector<GLuint> indices4Points);
+
+	void drawAsPointCloud();
 
 private: 
 	GLuint vao;
+	GLsizei numberOfIndices4Points;
 
 	GLuint vbo_posnorm;
 	GLuint vbo_tangents;

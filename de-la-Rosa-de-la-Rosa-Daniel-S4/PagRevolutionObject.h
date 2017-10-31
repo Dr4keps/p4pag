@@ -22,6 +22,8 @@ public:
 	glm::vec3* getTangents(PagRevObjParts part);
 	glm::vec2* getTextureCoords(PagRevObjParts part);
 	GLuint* getIndices4PointCloud(PagRevObjParts part);
+	
+	void drawAsPointCloud(PagRevObjParts part);
 
 private:
 	void createTopology4PointCloud();
@@ -50,6 +52,8 @@ private:
 	std::vector<GLuint> i4TriangleMesh_body;
 	std::vector<GLuint> i4TriangleMesh_bottom_fan;
 	std::vector<GLuint> i4TriangleMesh_top_fan;
+
+	PagVAO vaoBody;
 
 };
 

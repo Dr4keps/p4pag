@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PagShaderProgram.h"
+#include "PagRevolutionObject.h"
 
 // - La clase PagRenderer encapsula toda la gestión del área de dibujo
 // OpenGL, eventos, etc.
@@ -27,5 +28,6 @@ private:
 	static PagRenderer *instance;
 
 	PagShaderProgram pointShader;
+
 };
 
