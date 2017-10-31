@@ -47,5 +47,9 @@ private:
 	std::vector<GLuint> i4PointCloud_body;
 	std::vector<GLuint> i4PointCloud_topFan;
 
+	std::vector<GLuint> i4TriangleMesh_body;
+	std::vector<GLuint> i4TriangleMesh_bottom_fan;
+	std::vector<GLuint> i4TriangleMesh_top_fan;
+
 };
 

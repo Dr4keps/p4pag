@@ -157,6 +157,7 @@
     <ClCompile Include="PagRevolutionObject.cpp" />
     <ClCompile Include="PagShaderProgram.cpp" />
     <ClCompile Include="PagSubdivisionProfile.cpp" />
+    <ClCompile Include="PagVAO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PagEnumerations.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="PagShaderProgram.h" />
     <ClInclude Include="PagStructures.h" />
     <ClInclude Include="PagSubdivisionProfile.h" />
+    <ClInclude Include="PagVAO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pointShader-frag.glsl" />

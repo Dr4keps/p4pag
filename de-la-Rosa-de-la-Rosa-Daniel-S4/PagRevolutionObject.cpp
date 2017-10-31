@@ -235,6 +235,32 @@ void PagRevolutionObject::createTopology4PointCloud() {
 
 void PagRevolutionObject::createTopology4TriangleMesh() {
 
+	auto puntosPerfil = sp.getPoints().size();
+
+	if (sp.hasBottomFan()) {
+		//Se añaden todos menos el último que es repetido.
+		for (int i = 0; i < pos_norm_bottom_fan.size() - 1; i++) {
+			i4PointCloud_bottomFan.push_back(i);
+		}
+	}
+
+	if (sp.hasTopFan()) {
+		//Se añaden todos menos el primero que es repetido.
+		for (int i = 1; i < pos_norm_top_fan.size(); i++) {
+			i4PointCloud_topFan.push_back(i);
+		}
+	}
+
+	if (sp.hasBody()) {
+		//Añade todos menos los que se repiten
+		for (int s = 0; s < this->slices; s++) {
+			for (int i = 0; i < puntosPerfil; i++) {
+				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s);
+				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s + 1);
+			}
+		}
+	}
+
 }
 
 

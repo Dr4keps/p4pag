@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <glm.hpp>
+//#include <gtc\matrix_transform.hpp>
 #include "PagRevolutionObject.h"
 
 
@@ -11,6 +12,7 @@ PagRenderer* PagRenderer::instance = nullptr;
 
 PagRenderer::PagRenderer()
 {
+
 }
 
 
@@ -31,7 +33,23 @@ PagRenderer* PagRenderer::getInstance() {
 void PagRenderer::refreshCallback() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//glEnable(GL_PROGRAM_POINT_SIZE);
+	
+	/*auto perspective = glm::perspective(90.0f, 1.0f, 0.0f, 50.0f);
+	auto vision = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 modeling(
+		glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), 
+		glm::vec4(0.0f, 1.0f, 0.0f, 0.0f), 
+		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) 
+	);
+
+	auto mvp = perspective * vision * modeling;*/
+
 	pointShader.use();
+	/*pointShader.setUniform("pointSize", 7.0f);
+	pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	pointShader.setUniform("mModelViewProj", mvp);*/
 
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 }
@@ -81,19 +99,16 @@ void PagRenderer::prepareOpenGL()
 	glm::vec2 p2(1, 0);
 	glm::vec2 p3(1, 2);
 	glm::vec2 p4(2, 3);
-	//algo
+
 	generatriz.push_back(p1);
 	generatriz.push_back(p2);
 	generatriz.push_back(p3);
 	generatriz.push_back(p4);
 
 	PagRevolutionObject ro(generatriz, 0, 4);
-	//std::cout << "Bottom fan" << std::endl;
-	//ro.getTextureCoords(PAG_BODY);
-	std::cout << "iCuerpo" << std::endl;
 
 	pointShader.createShaderProgram("pointShader");
-
+	
 }
 
 
