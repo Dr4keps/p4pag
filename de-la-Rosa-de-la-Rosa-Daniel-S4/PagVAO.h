@@ -1,9 +1,10 @@
 #pragma once
 #include <Windows.h>
+#include <vector>
+#include <glm.hpp>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
-
-#include "PagEnumerations.h"
+#include "PagStructures.h"
 
 class PagVAO
 {
@@ -11,18 +12,26 @@ public:
 	PagVAO();
 	~PagVAO();
 
-	void createVBO(PagRevObjParts part);
+	bool createVBOPosNorm();
+	bool createVBOTangents();
+	bool createVBOTexCoord();
+
+	bool fillVBOPosNorm(std::vector<PagPosNorm> ppn);
+	bool fillVBOTangents();
+	bool fillVBOTexCoord();
+
+	bool createIBOCloudPoint();
 
 private: 
 	GLuint vao;
 
-	GLuint vbo_bottom_fan;
-	GLuint vbo_body;
-	GLuint vbo_top_fan;
+	GLuint vbo_posnorm;
+	GLuint vbo_tangents;
+	GLuint vbo_texcoord;
 
-	GLuint ibo_bottom_fan;
-	GLuint ibo_body;
-	GLuint ibo_top_fan;
+	GLuint ibo_cloudPoint;
+	GLuint ibo_wireFrame;
+	GLuint ibo_triangles;
 
 	void createVAO();
 };

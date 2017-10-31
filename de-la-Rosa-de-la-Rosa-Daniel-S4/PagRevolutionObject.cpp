@@ -1,7 +1,4 @@
 #include "PagRevolutionObject.h"
-#include "PagStructures.h"
-#include <glm.hpp>
-#include <vector>
 
 PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned int subdivisions,
 	unsigned int slices) : sp(points), subdivisions(subdivisions), slices(slices)
@@ -198,7 +195,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 	this->createTopology4PointCloud();
 
-	PagVAO vaoalgo;
+	PagVAO vaoBody;
 
 }
 

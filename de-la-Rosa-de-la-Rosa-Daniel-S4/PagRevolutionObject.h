@@ -4,6 +4,7 @@
 #include <iostream>
 #include "PagSubdivisionProfile.h"
 #include "PagEnumerations.h"
+#include "PagStructures.h"
 #include "PagVAO.h"
 
 
