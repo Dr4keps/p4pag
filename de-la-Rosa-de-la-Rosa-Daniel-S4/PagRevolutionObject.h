@@ -1,12 +1,11 @@
 #pragma once
-#include <Windows.h>
-#include <GL/GL.h>
 #include <glm.hpp>
 #include <vector>
 #include <iostream>
 #include "PagSubdivisionProfile.h"
 #include "PagEnumerations.h"
-#include "PagStructures.h"
+#include "PagVAO.h"
+
 
 
 class PagRevolutionObject

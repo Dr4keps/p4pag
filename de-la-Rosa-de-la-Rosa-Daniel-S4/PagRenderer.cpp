@@ -33,7 +33,7 @@ PagRenderer* PagRenderer::getInstance() {
 void PagRenderer::refreshCallback() {
 
 	//BORRAR
-	glm::vec3 points[] = { glm::vec3(-1.0, -1.0, 0.0),
+	/*glm::vec3 points[] = { glm::vec3(-1.0, -1.0, 0.0),
 		glm::vec3(1.0, -1.0, 0.0),
 		glm::vec3(-1.0, 1.0, 0.0),
 		glm::vec3(1.0, 1.0, 0.0)
@@ -57,19 +57,19 @@ void PagRenderer::refreshCallback() {
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-		GL_STATIC_DRAW);
+		GL_STATIC_DRAW);*/
 
 	//
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	/*glClearColor(1.0f, 1.0f, 1.0f, 1.0f);*/
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_PROGRAM_POINT_SIZE);
+	/*glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(vao);*/
 	
-	auto perspective = glm::perspective(glm::radians(0.52f), 1.0f, 0.1f, 50.0f);
+	auto perspective = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 50.0f);
 	auto vision = glm::lookAt(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 modeling(
 		glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), 
@@ -85,8 +85,8 @@ void PagRenderer::refreshCallback() {
 	pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
 	pointShader.setUniform("mModelViewProj", mvp);
 
-	glDrawElements(GL_POINTS, sizeof(indices) / sizeof(GLuint),
-		GL_UNSIGNED_INT, NULL);
+	/*glDrawElements(GL_POINTS, sizeof(indices) / sizeof(GLuint),
+		GL_UNSIGNED_INT, NULL);*/
 
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 }

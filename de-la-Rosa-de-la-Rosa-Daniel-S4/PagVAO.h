@@ -3,11 +3,15 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
+#include "PagEnumerations.h"
+
 class PagVAO
 {
 public:
 	PagVAO();
 	~PagVAO();
+
+	void createVBO(PagRevObjParts part);
 
 private: 
 	GLuint vao;
@@ -19,5 +23,7 @@ private:
 	GLuint ibo_bottom_fan;
 	GLuint ibo_body;
 	GLuint ibo_top_fan;
+
+	void createVAO();
 };
 
