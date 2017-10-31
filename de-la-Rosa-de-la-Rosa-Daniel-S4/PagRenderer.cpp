@@ -73,8 +73,6 @@ void PagRenderer::mouseButtonCallback(int button, int action, int mods)
 {
 	if (action == GLFW_PRESS) {
 		std::cout << "Pulsado el boton: " << button << std::endl;
-		//BORRAR
-		prepareOpenGL();
 	}
 	else if (action == GLFW_RELEASE) {
 		std::cout << "Soltado el boton: " << button << std::endl;
