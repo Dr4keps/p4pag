@@ -194,6 +194,7 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 
 	this->createTopology4PointCloud();
+	this->createTopology4TriangleMesh();
 
 	std::cout << "createVBO: " << vaoBody.createVBOPosNorm() << std::endl;
 	std::cout << "createIBO4PointCloud: " << vaoBody.createIBO4PointCloud() << std::endl;
@@ -212,14 +213,14 @@ void PagRevolutionObject::createTopology4PointCloud() {
 
 	if (sp.hasBottomFan()) {
 		//Se añaden todos menos el último que es repetido.
-		for (int i = 0; i < pos_norm_bottom_fan.size() - 1; i++) {
+		for (int i = 0; i <= pos_norm_bottom_fan.size() - 1; i++) {
 			i4PointCloud_bottomFan.push_back(i);
 		}
 	}
 
 	if (sp.hasTopFan()) {
 		//Se añaden todos menos el primero que es repetido.
-		for (int i = 1; i < pos_norm_top_fan.size(); i++) {
+		for (int i = 1; i <= pos_norm_top_fan.size(); i++) {
 			i4PointCloud_topFan.push_back(i);
 		}
 	}
@@ -234,20 +235,24 @@ void PagRevolutionObject::createTopology4PointCloud() {
 	}
 }
 
-
+//PROBAR
 void PagRevolutionObject::createTopology4TriangleMesh() {
 
 	auto puntosPerfil = sp.getPoints().size();
 
 	if (sp.hasBottomFan()) {
-		for (int i = 0; i < pos_norm_bottom_fan.size() - 1; i++) {
-			i4PointCloud_bottomFan.push_back(i);
+		for (int i = 1; i <= pos_norm_bottom_fan.size() - 1; i++) {
+			i4TriangleMesh_bottom_fan.push_back(1);
+			i4TriangleMesh_bottom_fan.push_back(i);
+			i4TriangleMesh_bottom_fan.push_back(i + 1);
 		}
 	}
 
 	if (sp.hasTopFan()) {
-		for (int i = 1; i < pos_norm_top_fan.size(); i++) {
+		for (int i = 1; i < pos_norm_top_fan.size() - 1; i++) {
+			i4PointCloud_topFan.push_back(pos_norm_top_fan.size() - 1);
 			i4PointCloud_topFan.push_back(i);
+			i4PointCloud_topFan.push_back(i + 1);
 		}
 	}
 
@@ -367,8 +372,8 @@ GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
 
 	if ((part == PAG_BODY) && (sp.hasBody())) {
 		std::cout << "Indices4PointCloud cuerpo: " << std::endl;
-		for (int i = 0; i < i4PointCloud_body.size(); i++) {
-			std::cout << "- " << i4PointCloud_body[i] << " -" << std::endl;
+		for (int i = 0; i < this->i4TriangleMesh_body.size(); i++) {
+			std::cout << "- " << i4TriangleMesh_body[i] << " -" << std::endl;
 		}
 		
 		return i4PointCloud_body.data();
@@ -397,5 +402,14 @@ GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
 
 
 void PagRevolutionObject::drawAsPointCloud(PagRevObjParts part) {
-	vaoBody.drawAsPointCloud();
+	
+	switch (part) {
+	case PAG_BODY:
+		vaoBody.drawAsPointCloud();
+		break;
+	case PAG_BOTTOM_FAN:
+		break;
+	case PAG_TOP_FAN:
+		break;
+	}
 }

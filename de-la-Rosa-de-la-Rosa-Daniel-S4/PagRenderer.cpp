@@ -50,7 +50,8 @@ void PagRenderer::refreshCallback() {
 	generatriz.push_back(p3);
 	generatriz.push_back(p4);
 
-	PagRevolutionObject revolutionObj(generatriz, 0, 2);
+	PagRevolutionObject revolutionObj(generatriz, 0, 4);
+	revolutionObj.getIndices4PointCloud(PAG_BODY);
 
 
 	//BORRAR
