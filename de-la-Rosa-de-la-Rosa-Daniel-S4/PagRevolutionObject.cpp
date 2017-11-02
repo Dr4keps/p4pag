@@ -1,7 +1,8 @@
 #include "PagRevolutionObject.h"
 
 PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned int subdivisions,
-	unsigned int slices) : sp(points), subdivisions(subdivisions), slices(slices)
+	unsigned int slices) : sp(points), subdivisions(subdivisions), slices(slices), vaoBody(),
+					vaoBottomFan(), vaoTopFan()
 {
 
 	if (subdivisions > 0) {
@@ -38,9 +39,9 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 		ppn.position = glm::vec3(0, pt.y, 0);
 		ppn.normal = glm::vec3(0, -1, 0);
 
-		pos_norm_bottom_fan.push_back(ppn);
-		tangents_bottom_fan.push_back(glm::vec3(-1, 0, 0));
-		texcoord_bottom_fan.push_back(glm::vec2(0.5, 0.5));
+		pos_norm_bottomFan.push_back(ppn);
+		tangents_bottomFan.push_back(glm::vec3(-1, 0, 0));
+		texcoord_bottomFan.push_back(glm::vec2(0.5, 0.5));
 	}
 	else {
 		//Aunque no tenga tapa de abajo, el primer punto es un caso especial
@@ -128,39 +129,39 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 			//Si es el segundo punto y tiene tapa de abajo, este punto también pertenece a ella.
 			if ((i == 1) && (sp.hasBottomFan())) {
-				pos_norm_bottom_fan.push_back(ppn);
-				tangents_bottom_fan.push_back(tg);
+				pos_norm_bottomFan.push_back(ppn);
+				tangents_bottomFan.push_back(tg);
 				//Calculamos su coordenada de textura de la tapa.
 				glm::vec2 fan_tc((cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f, (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f);
-				texcoord_bottom_fan.push_back(fan_tc);
+				texcoord_bottomFan.push_back(fan_tc);
 			}
 			//Si es el penúltimo punto y tiene tapa de arriba, este punto también pertenece a ella.
 			if ((i == profile_pts.size() - 2) && (sp.hasTopFan())){
-				pos_norm_top_fan.push_back(ppn);
-				tangents_top_fan.push_back(tg);
+				pos_norm_topFan.push_back(ppn);
+				tangents_topFan.push_back(tg);
 				//Calculamos su coordenada de textura de la tapa.
 				glm::vec2 fan_tc((cos(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f, (sin(a * glm::pi<float>() / 180.0f) + 1.0f) / 2.0f);
-				texcoord_top_fan.push_back(fan_tc);
+				texcoord_topFan.push_back(fan_tc);
 			}
 		}
 	}
 
 
 	//PUNTO FINAL DEL PERFIL.
+	pt = profile_pts[profile_pts.size() - 1];
 	//Si tiene tapa arriba, el punto que añadimos es ese, con normal (0, 1, 0)
 	//y tangente (0, 0, -1). Lo hacemos directamente.
 	if (sp.hasTopFan()) {
 		ppn.position = glm::vec3(0, pt.y, 0);
 		ppn.normal = glm::vec3(0, 1, 0);
 
-		pos_norm_top_fan.push_back(ppn);
-		tangents_top_fan.push_back(glm::vec3(0, 0, -1));
-		texcoord_top_fan.push_back(glm::vec2(0.5, 0.5));
+		pos_norm_topFan.push_back(ppn);
+		tangents_topFan.push_back(glm::vec3(0, 0, -1));
+		texcoord_topFan.push_back(glm::vec2(0.5, 0.5));
 	}
 	else {
 		//Aunque no tenga tapa de arriba, el último punto es un caso especial
 		//ya que solo tiene un vecino para calcular la normal: el de abajo.
-		pt = profile_pts[profile_pts.size() - 1];
 
 		for (int s = 0; s <= slices; s++) {
 			//Tomamos el vecino de abajo.
@@ -194,12 +195,31 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 
 	this->createTopology4PointCloud();
+	this->createTopology4WireFrame();
 	this->createTopology4TriangleMesh();
 
-	std::cout << "createVBO: " << vaoBody.createVBOPosNorm() << std::endl;
-	std::cout << "createIBO4PointCloud: " << vaoBody.createIBO4PointCloud() << std::endl;
-	std::cout << "fillVBO: " << vaoBody.fillVBOPosNorm(pos_norm_body) << std::endl;
-	std::cout << "fillIBO4PointCloud: " << vaoBody.fillIBO4PointCloud(i4PointCloud_body) << std::endl;
+	vaoBody.createVBOPosNorm();
+	//createVBOTangents();
+	//createVBOTexCoord();
+	vaoBody.createIBO4PointCloud();
+	//createIBO4WireFrame();
+	//createIBO4TriangleMesh();
+	vaoBody.fillVBOPosNorm(pos_norm_body);
+	//fillVBOTangents();
+	//fillVBOTexCoord();
+	vaoBody.fillIBO4PointCloud(i4PointCloud_body);
+	//fillIBO4WireFrame(i4WireFrame_body);
+	//fillIBO4TriangleMesh(i4TriangleMesh_body);
+
+	vaoBottomFan.createVBOPosNorm();
+	vaoBottomFan.createIBO4PointCloud();
+	vaoBottomFan.fillVBOPosNorm(pos_norm_bottomFan);
+	vaoBottomFan.fillIBO4PointCloud(i4PointCloud_bottomFan);
+
+	vaoTopFan.createVBOPosNorm();
+	vaoTopFan.createIBO4PointCloud();
+	vaoTopFan.fillVBOPosNorm(pos_norm_topFan);
+	vaoTopFan.fillIBO4PointCloud(i4PointCloud_topFan);
 
 }
 
@@ -213,14 +233,14 @@ void PagRevolutionObject::createTopology4PointCloud() {
 
 	if (sp.hasBottomFan()) {
 		//Se añaden todos menos el último que es repetido.
-		for (int i = 0; i <= pos_norm_bottom_fan.size() - 1; i++) {
+		for (int i = 0; i <= pos_norm_bottomFan.size() - 1; i++) {
 			i4PointCloud_bottomFan.push_back(i);
 		}
 	}
 
 	if (sp.hasTopFan()) {
 		//Se añaden todos menos el primero que es repetido.
-		for (int i = 1; i <= pos_norm_top_fan.size(); i++) {
+		for (int i = 1; i < pos_norm_topFan.size(); i++) {
 			i4PointCloud_topFan.push_back(i);
 		}
 	}
@@ -235,30 +255,76 @@ void PagRevolutionObject::createTopology4PointCloud() {
 	}
 }
 
-//PROBAR
-void PagRevolutionObject::createTopology4TriangleMesh() {
-
-	auto puntosPerfil = sp.getPoints().size();
-
+//Rellena los vectores de índices para dibujar como lineas.
+void PagRevolutionObject::createTopology4WireFrame() {
 	if (sp.hasBottomFan()) {
-		for (int i = 1; i <= pos_norm_bottom_fan.size() - 1; i++) {
-			i4TriangleMesh_bottom_fan.push_back(1);
-			i4TriangleMesh_bottom_fan.push_back(i);
-			i4TriangleMesh_bottom_fan.push_back(i + 1);
+		for (int i = 1; i < pos_norm_bottomFan.size(); i++) {
+			i4WireFrame_bottomFan.push_back(i);
 		}
 	}
 
 	if (sp.hasTopFan()) {
-		for (int i = 1; i < pos_norm_top_fan.size() - 1; i++) {
-			i4PointCloud_topFan.push_back(pos_norm_top_fan.size() - 1);
-			i4PointCloud_topFan.push_back(i);
-			i4PointCloud_topFan.push_back(i + 1);
+		for (int i = 0; i < pos_norm_topFan.size() - 1; i++) {
+			i4WireFrame_topFan.push_back(i);
 		}
 	}
 
 	if (sp.hasBody()) {
+		int pisos = sp.getPoints().size();
+		if (sp.hasBottomFan())
+			pisos--;
+		//pisos contiene el número de pisos del cuerpo del objeto de revolución.
+		if (sp.hasTopFan())
+			pisos--;
+
+		//En horizontal
+		for (int i = 0; i < pisos; i++) {
+			for (int s = 0; s <= slices; s++) {
+				i4WireFrame_body.push_back(i*(slices + 1) + s);
+			}
+			i4WireFrame_body.push_back(0xFFFF);
+		}
+
+		//En vertical
+		for (int s = 0; s < slices; s++) {
+			for (int i = 0; i < pisos; i++) {
+				i4WireFrame_body.push_back((i * (slices + 1)) + s);
+			}
+			i4WireFrame_body.push_back(0xFFFF);
+		}
+	}
+
+}
+
+//PROBAR (creo que bien)
+//Rellena los vectores de índices para dibujar como modelo de alambre.
+void PagRevolutionObject::createTopology4TriangleMesh() {
+
+	if (sp.hasBottomFan()) {
+		for (int i = 1; i < pos_norm_bottomFan.size() - 1; i++) {
+			i4TriangleMesh_bottomFan.push_back(0);
+			i4TriangleMesh_bottomFan.push_back(i);
+			i4TriangleMesh_bottomFan.push_back(i + 1);
+		}
+	}
+
+	if (sp.hasTopFan()) {
+		for (int i = 0; i < pos_norm_topFan.size() - 1; i++) {
+			i4TriangleMesh_topFan.push_back(pos_norm_topFan.size() - 1);
+			i4TriangleMesh_topFan.push_back(i);
+			i4TriangleMesh_topFan.push_back(i + 1);
+		}
+	}
+
+	if (sp.hasBody()) {
+		int pisos = sp.getPoints().size();
+		if (sp.hasBottomFan())
+			pisos--;
+		if (sp.hasTopFan())
+			pisos--;
+		//pisos contiene el número de pisos del cuerpo del objeto de revolución.
 		for (int s = 0; s < this->slices; s++) {
-			for (int i = 0; i < puntosPerfil; i++) {
+			for (int i = 0; i < pisos; i++) {
 				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s);
 				i4TriangleMesh_body.push_back((i * (this->slices + 1)) + s + 1);
 			}
@@ -299,19 +365,19 @@ PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		for (int i = 0; i < pos_norm_top_fan.size(); i++) {
-			std::cout << i << " -> " << "Posición (" << pos_norm_top_fan[i].position.x << ", " << pos_norm_top_fan[i].position.y << ", " << pos_norm_top_fan[i].position.z << "). ";
-			std::cout << "Normal (" << pos_norm_top_fan[i].normal.x << ", " << pos_norm_top_fan[i].normal.y << ", " << pos_norm_top_fan[i].normal.z << ")." << std::endl;
+		for (int i = 0; i < pos_norm_topFan.size(); i++) {
+			std::cout << i << " -> " << "Posición (" << pos_norm_topFan[i].position.x << ", " << pos_norm_topFan[i].position.y << ", " << pos_norm_topFan[i].position.z << "). ";
+			std::cout << "Normal (" << pos_norm_topFan[i].normal.x << ", " << pos_norm_topFan[i].normal.y << ", " << pos_norm_topFan[i].normal.z << ")." << std::endl;
 		}
-		return pos_norm_top_fan.data();
+		return pos_norm_topFan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		for (int i = 0; i < pos_norm_bottom_fan.size(); i++) {
-			std::cout << i << " -> " << "Posición (" << pos_norm_bottom_fan[i].position.x << ", " << pos_norm_bottom_fan[i].position.y << ", " << pos_norm_bottom_fan[i].position.z << "). ";
-			std::cout << "Normal (" << pos_norm_bottom_fan[i].normal.x << ", " << pos_norm_bottom_fan[i].normal.y << ", " << pos_norm_bottom_fan[i].normal.z << ")." << std::endl;;
+		for (int i = 0; i < pos_norm_bottomFan.size(); i++) {
+			std::cout << i << " -> " << "Posición (" << pos_norm_bottomFan[i].position.x << ", " << pos_norm_bottomFan[i].position.y << ", " << pos_norm_bottomFan[i].position.z << "). ";
+			std::cout << "Normal (" << pos_norm_bottomFan[i].normal.x << ", " << pos_norm_bottomFan[i].normal.y << ", " << pos_norm_bottomFan[i].normal.z << ")." << std::endl;;
 		}
-		return pos_norm_bottom_fan.data();
+		return pos_norm_bottomFan.data();
 	}
 
 	return nullptr;
@@ -327,11 +393,11 @@ glm::vec3 * PagRevolutionObject::getTangents(PagRevObjParts part)
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		return tangents_top_fan.data();
+		return tangents_topFan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		return tangents_bottom_fan.data();
+		return tangents_bottomFan.data();
 	}
 
 	return nullptr;
@@ -350,17 +416,17 @@ glm::vec2 * PagRevolutionObject::getTextureCoords(PagRevObjParts part)
 	}
 
 	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		for (int i = 0; i < texcoord_top_fan.size(); i++) {
-			std::cout << "Coord. textura: (" << texcoord_top_fan[i].x << ", " << texcoord_top_fan[i].y << ")" << std::endl;
+		for (int i = 0; i < texcoord_topFan.size(); i++) {
+			std::cout << "Coord. textura: (" << texcoord_topFan[i].x << ", " << texcoord_topFan[i].y << ")" << std::endl;
 		}
-		return texcoord_top_fan.data();
+		return texcoord_topFan.data();
 	}
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		for (int i = 0; i < texcoord_bottom_fan.size(); i++) {
-			std::cout << "Coord. textura: (" << texcoord_bottom_fan[i].x << ", " << texcoord_bottom_fan[i].y << ")" << std::endl;
+		for (int i = 0; i < texcoord_bottomFan.size(); i++) {
+			std::cout << "Coord. textura: (" << texcoord_bottomFan[i].x << ", " << texcoord_bottomFan[i].y << ")" << std::endl;
 		}
-		return texcoord_bottom_fan.data();
+		return texcoord_bottomFan.data();
 	}
 
 	return nullptr;
@@ -372,8 +438,8 @@ GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
 
 	if ((part == PAG_BODY) && (sp.hasBody())) {
 		std::cout << "Indices4PointCloud cuerpo: " << std::endl;
-		for (int i = 0; i < this->i4TriangleMesh_body.size(); i++) {
-			std::cout << "- " << i4TriangleMesh_body[i] << " -" << std::endl;
+		for (int i = 0; i < i4WireFrame_body.size(); i++) {
+			std::cout << "- " << i4WireFrame_body[i] << " -" << std::endl;
 		}
 		
 		return i4PointCloud_body.data();
@@ -390,8 +456,8 @@ GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
 
 	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
 		std::cout << "Indices4PointCloud tapa abajo: " << std::endl;
-		for (int i = 0; i < i4PointCloud_bottomFan.size(); i++) {
-			std::cout << "- " << i4PointCloud_bottomFan[i] << " -" << std::endl;
+		for (int i = 0; i < i4WireFrame_bottomFan.size(); i++) {
+			std::cout << "- " << i4WireFrame_bottomFan[i] << " -" << std::endl;
 		}
 
 		return i4PointCloud_bottomFan.data();
@@ -408,8 +474,10 @@ void PagRevolutionObject::drawAsPointCloud(PagRevObjParts part) {
 		vaoBody.drawAsPointCloud();
 		break;
 	case PAG_BOTTOM_FAN:
+		vaoBottomFan.drawAsPointCloud();
 		break;
 	case PAG_TOP_FAN:
+		vaoTopFan.drawAsPointCloud();
 		break;
 	}
 }

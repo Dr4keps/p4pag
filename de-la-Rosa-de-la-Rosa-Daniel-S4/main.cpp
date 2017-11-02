@@ -37,8 +37,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	//Si ha sido otra tecla, entonces si llamamos a PagRenderer y su función correspondiente.
 	else {
 		PagRenderer::getInstance()->keyCallback(key, scancode, action, mods);
+		glfwSwapBuffers(window);
 	}
-
 }
 
 // - Esta función callback será llamada cada vez que se pulse algún botón

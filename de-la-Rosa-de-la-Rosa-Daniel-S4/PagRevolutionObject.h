@@ -28,32 +28,39 @@ public:
 private:
 	void createTopology4PointCloud();
 	void createTopology4TriangleMesh();
+	void createTopology4WireFrame();
 
 	PagSubdivisionProfile sp;
 	unsigned int subdivisions;
 	unsigned int slices;
 
 	std::vector<PagPosNorm> pos_norm_body;
-	std::vector<PagPosNorm> pos_norm_bottom_fan;
-	std::vector<PagPosNorm> pos_norm_top_fan;
+	std::vector<PagPosNorm> pos_norm_bottomFan;
+	std::vector<PagPosNorm> pos_norm_topFan;
 
 	std::vector<glm::vec3> tangents_body;
-	std::vector<glm::vec3> tangents_bottom_fan;
-	std::vector<glm::vec3> tangents_top_fan;
+	std::vector<glm::vec3> tangents_bottomFan;
+	std::vector<glm::vec3> tangents_topFan;
 
 	std::vector<glm::vec2> texcoord_body;
-	std::vector<glm::vec2> texcoord_bottom_fan;
-	std::vector<glm::vec2> texcoord_top_fan;
+	std::vector<glm::vec2> texcoord_bottomFan;
+	std::vector<glm::vec2> texcoord_topFan;
 
 	std::vector<GLuint> i4PointCloud_bottomFan;
 	std::vector<GLuint> i4PointCloud_body;
 	std::vector<GLuint> i4PointCloud_topFan;
 
 	std::vector<GLuint> i4TriangleMesh_body;
-	std::vector<GLuint> i4TriangleMesh_bottom_fan;
-	std::vector<GLuint> i4TriangleMesh_top_fan;
+	std::vector<GLuint> i4TriangleMesh_bottomFan;
+	std::vector<GLuint> i4TriangleMesh_topFan;
+
+	std::vector<GLuint> i4WireFrame_body;
+	std::vector<GLuint> i4WireFrame_bottomFan;
+	std::vector<GLuint> i4WireFrame_topFan;
 
 	PagVAO vaoBody;
+	PagVAO vaoBottomFan;
+	PagVAO vaoTopFan;
 
 };
 
