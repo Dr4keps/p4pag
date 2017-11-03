@@ -199,14 +199,17 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	this->createTopology4TriangleMesh();
 
 	vaoBody.createVBOPosNorm();
-	//createVBOTangents();
-	//createVBOTexCoord();
+	vaoBody.createVBOTangents();
+	vaoBody.createVBOTexCoord();
+
 	vaoBody.createIBO4PointCloud();
 	//createIBO4WireFrame();
 	//createIBO4TriangleMesh();
+
 	vaoBody.fillVBOPosNorm(pos_norm_body);
-	//fillVBOTangents();
-	//fillVBOTexCoord();
+	vaoBody.fillVBOTangents(tangents_body);
+	vaoBody.fillVBOTexCoord(texcoord_body);
+
 	vaoBody.fillIBO4PointCloud(i4PointCloud_body);
 	//fillIBO4WireFrame(i4WireFrame_body);
 	//fillIBO4TriangleMesh(i4TriangleMesh_body);
@@ -233,7 +236,7 @@ void PagRevolutionObject::createTopology4PointCloud() {
 
 	if (sp.hasBottomFan()) {
 		//Se añaden todos menos el último que es repetido.
-		for (int i = 0; i <= pos_norm_bottomFan.size() - 1; i++) {
+		for (int i = 0; i < pos_norm_bottomFan.size() - 1; i++) {
 			i4PointCloud_bottomFan.push_back(i);
 		}
 	}

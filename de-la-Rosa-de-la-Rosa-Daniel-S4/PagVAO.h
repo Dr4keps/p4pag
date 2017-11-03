@@ -17,8 +17,8 @@ public:
 	bool createVBOTexCoord();
 
 	bool fillVBOPosNorm(std::vector<PagPosNorm> ppn);
-	bool fillVBOTangents();
-	bool fillVBOTexCoord();
+	bool fillVBOTangents(std::vector<glm::vec3> tangents);
+	bool fillVBOTexCoord(std::vector<glm::vec2> tc);
 
 	bool createIBO4PointCloud();
 

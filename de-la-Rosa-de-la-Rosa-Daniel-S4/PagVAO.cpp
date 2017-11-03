@@ -73,6 +73,46 @@ bool PagVAO::createVBOPosNorm() {
 
 }
 
+bool PagVAO::createVBOTangents() {
+	if (vao >= 0) {
+		// - Se genera el VBO y se activa
+		glGenBuffers(1, &vbo_tangents);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_tangents);
+
+		// - Se describe cómo es la geometría que hay en ese array 
+		// - Aquí se describen las características del puntero que permite a la GPU acceder a las 
+		//   posiciones
+		glVertexAttribPointer(2, sizeof(glm::vec3) / sizeof(GLfloat),
+			GL_FLOAT, GL_FALSE, sizeof(glm::vec3),
+			((GLubyte *)NULL + (0)));
+		return true;
+	}
+	else {
+		std::cout << "Cannot create VBO for this VAO \n" << std::endl;
+		return false;
+	}
+}
+
+bool PagVAO::createVBOTexCoord() {
+	if (vao >= 0) {
+		// - Se genera el VBO y se activa
+		glGenBuffers(1, &vbo_texcoord);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoord);
+
+		// - Se describe cómo es la geometría que hay en ese array 
+		// - Aquí se describen las características del puntero que permite a la GPU acceder a las 
+		//   posiciones
+		glVertexAttribPointer(3, sizeof(glm::vec2) / sizeof(GLfloat),
+			GL_FLOAT, GL_FALSE, sizeof(glm::vec2),
+			((GLubyte *)NULL + (0)));
+		return true;
+	}
+	else {
+		std::cout << "Cannot create VBO for this VAO \n" << std::endl;
+		return false;
+	}
+}
+
 
 bool PagVAO::fillVBOPosNorm(std::vector<PagPosNorm> ppn) {
 
@@ -93,6 +133,39 @@ bool PagVAO::fillVBOPosNorm(std::vector<PagPosNorm> ppn) {
 	
 }
 
+bool PagVAO::fillVBOTangents(std::vector<glm::vec3> tangents) {
+	if (vao > 0 && vbo_posnorm > 0) {
+		// - Se activa el VAO que contiene al VBO que se quiere rellenar con su array de geometría
+		glBindVertexArray(vao);
+
+		// - Se activa el VBO que se quiere rellenar
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_tangents);
+
+		glBufferData(GL_ARRAY_BUFFER, tangents.size() * sizeof(glm::vec3), tangents.data(), GL_STATIC_DRAW);
+
+		return true;
+	}
+	else {
+		std::cout << "Cannot fill positions and normals VBO" << std::endl;
+	}
+}
+
+bool PagVAO::fillVBOTexCoord(std::vector<glm::vec2> tc) {
+	if (vao > 0 && vbo_posnorm > 0) {
+		// - Se activa el VAO que contiene al VBO que se quiere rellenar con su array de geometría
+		glBindVertexArray(vao);
+
+		// - Se activa el VBO que se quiere rellenar
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoord);
+
+		glBufferData(GL_ARRAY_BUFFER, tc.size() * sizeof(glm::vec2), tc.data(), GL_STATIC_DRAW);
+
+		return true;
+	}
+	else {
+		std::cout << "Cannot fill positions and normals VBO" << std::endl;
+	}
+}
 
 bool PagVAO::createIBO4PointCloud() {
 	if (vao > 0) {

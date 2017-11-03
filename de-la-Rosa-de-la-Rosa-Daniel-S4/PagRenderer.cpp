@@ -32,13 +32,18 @@ void PagRenderer::refreshCallback() {
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 
 	std::vector<glm::vec2> generatriz;
-	glm::vec2 p1(0, 0);
-	glm::vec2 p2(1, 0);
+	//glm::vec2 p1(0, 0);
+	/*glm::vec2 p2(1, 0);
 	glm::vec2 p3(1, 2);
 	glm::vec2 p4(2, 3);
-	glm::vec2 p5(0, 4);
+	glm::vec2 p5(0, 4);*/
 
-	generatriz.push_back(p1);
+	glm::vec2 p2(0, 0);
+	glm::vec2 p3(1, 1);
+	glm::vec2 p4(2, 2);
+	glm::vec2 p5(3, 3);
+
+	//generatriz.push_back(p1);
 	generatriz.push_back(p2);
 	generatriz.push_back(p3);
 	generatriz.push_back(p4);
@@ -48,7 +53,7 @@ void PagRenderer::refreshCallback() {
 
 	std::cout << "PosCamara: " << posCamera.x << ", " << posCamera.y << ", " << posCamera.z << std::endl;
 
-	glm::mat4 perspective = glm::perspective(glm::radians(90.0f), 4.0f/3.0f, 0.1f, 100.0f);
+	glm::mat4 perspective = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
 	glm::mat4 vision = glm::lookAt(posCamera, lookAtCamera, upCamera);
 
 	this->pointShader.use();
@@ -56,8 +61,8 @@ void PagRenderer::refreshCallback() {
 	this->pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
 	this->pointShader.setUniform("mModelViewProj", perspective * vision);
 
-	//revolutionObj.drawAsPointCloud(PAG_BODY);
-	revolutionObj.drawAsPointCloud(PAG_TOP_FAN);
+	revolutionObj.drawAsPointCloud(PAG_BODY);
+	//revolutionObj.drawAsPointCloud(PAG_TOP_FAN);
 
 	//revolutionObj.getPositionsAndNormals(PAG_TOP_FAN);
 	//revolutionObj.getIndices4PointCloud(PAG_TOP_FAN);
