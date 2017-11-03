@@ -64,5 +64,11 @@
     <None Include="pointShader-frag.glsl">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include="wireFrameShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="wireFrameShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>

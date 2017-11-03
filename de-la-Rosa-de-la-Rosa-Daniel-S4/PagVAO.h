@@ -21,6 +21,7 @@ public:
 
 
 	void drawAsPointCloud();
+	void drawAsWireFrame();
 
 private: 
 	GLuint vao;
@@ -43,5 +44,6 @@ private:
 	void createVBOTexCoord();
 
 	void createIBO4PointCloud();
+	void createIBO4WireFrame();
 };
 

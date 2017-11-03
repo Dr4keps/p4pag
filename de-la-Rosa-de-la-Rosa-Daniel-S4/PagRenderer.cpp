@@ -6,9 +6,6 @@ PagRenderer* PagRenderer::instance = nullptr;
 
 PagRenderer::PagRenderer()
 {
-	posCamera = glm::vec3(0.0f, 0.0f, 10.0f);
-	lookAtCamera = glm::vec3(0.0f, 0.0f, 0.0f);
-	upCamera = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 
@@ -32,40 +29,55 @@ void PagRenderer::refreshCallback() {
 	std::cout << "PagRenderer::refreshCallback called" << std::endl;
 
 	std::vector<glm::vec2> generatriz;
-	//glm::vec2 p1(0, 0);
-	/*glm::vec2 p2(1, 0);
+	glm::vec2 p1(0, 0);
+	glm::vec2 p2(1, 0);
 	glm::vec2 p3(1, 2);
-	glm::vec2 p4(2, 3);
-	glm::vec2 p5(0, 4);*/
+	glm::vec2 p4(3, 2);
+	glm::vec2 p5(0, 4);
 
-	glm::vec2 p2(0, 0);
-	glm::vec2 p3(1, 0);
-	glm::vec2 p4(1, 2);
-	glm::vec2 p5(2, 3);
+	//glm::vec2 p2(0, 0);
+	//glm::vec2 p3(1, 1);
+	//glm::vec2 p4(2, 2);
+	//glm::vec2 p5(3, 3);
+	//glm::vec2 p6(4, 4);
 
-	//generatriz.push_back(p1);
+	generatriz.push_back(p1);
 	generatriz.push_back(p2);
 	generatriz.push_back(p3);
 	generatriz.push_back(p4);
 	generatriz.push_back(p5);
+	//generatriz.push_back(p6);
 
-	PagRevolutionObject revolutionObj(generatriz, 2, 6);
+	PagRevolutionObject revolutionObj(generatriz, 1, 40);
 
 	std::cout << "PosCamara: " << posCamera.x << ", " << posCamera.y << ", " << posCamera.z << std::endl;
 
 	glm::mat4 perspective = glm::perspective(glm::radians(60.0f), 4.0f/3.0f, 0.1f, 100.0f);
 	glm::mat4 vision = glm::lookAt(posCamera, lookAtCamera, upCamera);
 
-	this->pointShader.use();
-	this->pointShader.setUniform("pointSize", 5.0f);
-	this->pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	this->pointShader.setUniform("mModelViewProj", perspective * vision);
+	if (drawPoints) {
+		std::cout << "Pintaputos" << std::endl;
+		this->pointShader.use();
+		this->pointShader.setUniform("pointSize", 5.0f);
+		this->pointShader.setUniform("vColor", glm::vec3(0.0f, 0.0f, 1.0f));
+		this->pointShader.setUniform("mModelViewProj", perspective * vision);
 
-	revolutionObj.drawAsPointCloud(PAG_BODY);
-	//revolutionObj.drawAsPointCloud(PAG_TOP_FAN);
+		revolutionObj.drawAsPointCloud(PAG_BODY);
+		revolutionObj.drawAsPointCloud(PAG_BOTTOM_FAN);
+		revolutionObj.drawAsPointCloud(PAG_TOP_FAN);
+	}
 
-	//revolutionObj.getPositionsAndNormals(PAG_TOP_FAN);
-	//revolutionObj.getIndices4PointCloud(PAG_TOP_FAN);
+	if (drawWireFrame) {
+		std::cout << "Pintalineas" << std::endl;
+		this->wireFrameShader.use();
+		this->wireFrameShader.setUniform("mModelViewProj", perspective * vision);
+		this->wireFrameShader.setUniform("vColor", glm::vec3(1.0f, 0.0f, 1.0f));
+
+		revolutionObj.drawAsWireFrame(PAG_BODY);
+		revolutionObj.drawAsWireFrame(PAG_BOTTOM_FAN);
+		revolutionObj.drawAsWireFrame(PAG_TOP_FAN);
+	}
+
 
 }
 
@@ -83,7 +95,6 @@ void PagRenderer::keyCallback(int key, int scancode, int action, int mods)
 	switch (key) {
 	case 49: //Tecla del número 1.
 		if (action == GLFW_PRESS) {
-			std::cout << "He PULSADO EL 1" << std::endl;
 			posCamera = glm::vec3(0.0f, 0.0f, 10.0f);
 			lookAtCamera = glm::vec3(0.0f, 0.0f, 0.0f);
 			upCamera = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -92,13 +103,27 @@ void PagRenderer::keyCallback(int key, int scancode, int action, int mods)
 		break;
 	case 50: //Tecla del número 2.
 		if (action == GLFW_PRESS) {
-			std::cout << "He PULSADO EL 2" << std::endl;
 			posCamera = glm::vec3(0.0f, 10.0f, 0.0f);
 			lookAtCamera = glm::vec3(0.0f, 0.0f, 0.0f);
 			upCamera = glm::vec3(0.0f, 0.0f, 1.0f);
 			this->refreshCallback();
 		}
+		break;
+
+	case 87: //Tecla W.
+		if (action == GLFW_PRESS) {
+			this->drawWireFrame = !this->drawWireFrame;
+		}
+		this->refreshCallback();
+		break;
+	case 80: //Tecla P.
+		if (action == GLFW_PRESS) {
+			this->drawPoints = !this->drawPoints;
+		}
+		this->refreshCallback();
+		break;
 	}
+
 
 	std::cout << "PagRenderer::keyCallback called" << std::endl;
 }
@@ -127,6 +152,13 @@ void PagRenderer::scrollCallback(double xoffset, double yoffset)
 // - Prepara la escena para su visualización. Solo se llama una única vez.
 void PagRenderer::prepareOpenGL()
 {
+	posCamera = glm::vec3(0.0f, 0.0f, 10.0f);
+	lookAtCamera = glm::vec3(0.0f, 0.0f, 0.0f);
+	upCamera = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	drawPoints = false;
+	drawWireFrame = true;
+	drawTriangles = true;
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,6 +169,7 @@ void PagRenderer::prepareOpenGL()
 	glPrimitiveRestartIndex(0xFFFF);
 
 	pointShader.createShaderProgram("pointShader");
+	std::cout << "WireFrameShader" << wireFrameShader.createShaderProgram("wireFrameShader") << std::endl;
 	
 }
 

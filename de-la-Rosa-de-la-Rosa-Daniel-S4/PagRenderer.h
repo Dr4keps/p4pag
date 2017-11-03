@@ -33,10 +33,15 @@ private:
 
 	static PagRenderer *instance;
 	PagShaderProgram pointShader;
+	PagShaderProgram wireFrameShader;
 
 	glm::vec3 posCamera;
 	glm::vec3 lookAtCamera;
 	glm::vec3 upCamera;
+
+	bool drawPoints;
+	bool drawWireFrame;
+	bool drawTriangles;
 
 };
 

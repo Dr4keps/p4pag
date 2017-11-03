@@ -24,6 +24,7 @@ public:
 	GLuint* getIndices4PointCloud(PagRevObjParts part);
 	
 	void drawAsPointCloud(PagRevObjParts part);
+	void drawAsWireFrame(PagRevObjParts part);
 
 private:
 	void createTopology4PointCloud();

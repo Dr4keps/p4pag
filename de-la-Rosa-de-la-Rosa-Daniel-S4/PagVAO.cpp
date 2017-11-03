@@ -21,9 +21,12 @@ PagVAO::PagVAO()
 		createVBOPosNorm();
 		createVBOTangents();
 		createVBOTexCoord();
+
+		createIBO4PointCloud();
+		createIBO4WireFrame();
 	}
 
-	createIBO4PointCloud();
+	
 
 }
 
@@ -81,6 +84,9 @@ void PagVAO::createVBOPosNorm() {
 
 void PagVAO::createVBOTangents() {
 	if (vao >= 0) {
+		// - Se activa el vao para este vbo.
+		glBindVertexArray(vao);
+
 		// - Se genera el VBO y se activa
 		glGenBuffers(1, &vbo_tangents);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_tangents);
@@ -99,6 +105,9 @@ void PagVAO::createVBOTangents() {
 
 void PagVAO::createVBOTexCoord() {
 	if (vao >= 0) {
+		// - Se activa el vao para este vbo.
+		glBindVertexArray(vao);
+
 		// - Se genera el VBO y se activa
 		glGenBuffers(1, &vbo_texcoord);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoord);
@@ -123,6 +132,20 @@ void PagVAO::createIBO4PointCloud() {
 
 		// - Se crea el ibo.
 		glGenBuffers(1, &ibo_cloudPoint);
+	}
+	else {
+		std::cout << "Cannot create IBO for this VAO \n" << std::endl;
+	}
+}
+
+
+void PagVAO::createIBO4WireFrame() {
+	if (vao > 0) {
+		// - Se activa el vao para este ibo.
+		glBindVertexArray(vao);
+
+		// - Se crea el ibo.
+		glGenBuffers(1, &ibo_wireFrame);
 	}
 	else {
 		std::cout << "Cannot create IBO for this VAO \n" << std::endl;
@@ -222,13 +245,15 @@ bool PagVAO::fillIBO4WireFrame(std::vector<GLuint> indices4WF) {
 		glBindVertexArray(vao);
 
 		// - Se activa el IBO que se quiere rellenar
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cloudPoint);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_wireFrame);
 
 		// - Se le pasa el array que contiene los índices
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices4WF.size() * sizeof(GLuint),
 			indices4WF.data(), GL_STATIC_DRAW);
 
-		numberOfIndices4Points = indices4WF.size();
+		numberOfIndices4WF = indices4WF.size();
+
+		return true;
 	}
 	else {
 		std::cout << "Cannot fill IBO for cloud points \n" << std::endl;
@@ -246,4 +271,17 @@ void PagVAO::drawAsPointCloud() {
 
 	// - Se dibuja la malla
 	glDrawElements(GL_POINTS, numberOfIndices4Points, GL_UNSIGNED_INT, NULL);
+}
+
+
+
+void PagVAO::drawAsWireFrame() {
+	// - Se activa el VAO
+	glBindVertexArray(vao);
+
+	// - Se activa el IBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_wireFrame);
+
+	// - Se dibuja la malla
+	glDrawElements(GL_LINE_STRIP, numberOfIndices4WF, GL_UNSIGNED_INT, NULL);
 }

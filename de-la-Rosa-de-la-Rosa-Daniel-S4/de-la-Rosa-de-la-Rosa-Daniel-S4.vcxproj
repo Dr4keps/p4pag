@@ -171,6 +171,8 @@
   <ItemGroup>
     <None Include="pointShader-frag.glsl" />
     <None Include="pointShader-vert.glsl" />
+    <None Include="wireFrameShader-frag.glsl" />
+    <None Include="wireFrameShader-vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
