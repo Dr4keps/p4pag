@@ -39,9 +39,9 @@ void PagRenderer::refreshCallback() {
 	glm::vec2 p5(0, 4);*/
 
 	glm::vec2 p2(0, 0);
-	glm::vec2 p3(1, 1);
-	glm::vec2 p4(2, 2);
-	glm::vec2 p5(3, 3);
+	glm::vec2 p3(1, 0);
+	glm::vec2 p4(1, 2);
+	glm::vec2 p5(2, 3);
 
 	//generatriz.push_back(p1);
 	generatriz.push_back(p2);
@@ -49,11 +49,11 @@ void PagRenderer::refreshCallback() {
 	generatriz.push_back(p4);
 	generatriz.push_back(p5);
 
-	PagRevolutionObject revolutionObj(generatriz, 0, 4);
+	PagRevolutionObject revolutionObj(generatriz, 2, 6);
 
 	std::cout << "PosCamara: " << posCamera.x << ", " << posCamera.y << ", " << posCamera.z << std::endl;
 
-	glm::mat4 perspective = glm::perspective(glm::radians(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
+	glm::mat4 perspective = glm::perspective(glm::radians(60.0f), 4.0f/3.0f, 0.1f, 100.0f);
 	glm::mat4 vision = glm::lookAt(posCamera, lookAtCamera, upCamera);
 
 	this->pointShader.use();

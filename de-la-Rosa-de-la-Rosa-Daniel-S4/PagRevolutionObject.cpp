@@ -198,29 +198,17 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	this->createTopology4WireFrame();
 	this->createTopology4TriangleMesh();
 
-	vaoBody.createVBOPosNorm();
-	vaoBody.createVBOTangents();
-	vaoBody.createVBOTexCoord();
-
-	vaoBody.createIBO4PointCloud();
-	//createIBO4WireFrame();
-	//createIBO4TriangleMesh();
-
 	vaoBody.fillVBOPosNorm(pos_norm_body);
 	vaoBody.fillVBOTangents(tangents_body);
 	vaoBody.fillVBOTexCoord(texcoord_body);
 
 	vaoBody.fillIBO4PointCloud(i4PointCloud_body);
-	//fillIBO4WireFrame(i4WireFrame_body);
+	vaoBody.fillIBO4WireFrame(i4WireFrame_body);
 	//fillIBO4TriangleMesh(i4TriangleMesh_body);
 
-	vaoBottomFan.createVBOPosNorm();
-	vaoBottomFan.createIBO4PointCloud();
 	vaoBottomFan.fillVBOPosNorm(pos_norm_bottomFan);
 	vaoBottomFan.fillIBO4PointCloud(i4PointCloud_bottomFan);
 
-	vaoTopFan.createVBOPosNorm();
-	vaoTopFan.createIBO4PointCloud();
 	vaoTopFan.fillVBOPosNorm(pos_norm_topFan);
 	vaoTopFan.fillIBO4PointCloud(i4PointCloud_topFan);
 
@@ -261,15 +249,32 @@ void PagRevolutionObject::createTopology4PointCloud() {
 //Rellena los vectores de índices para dibujar como lineas.
 void PagRevolutionObject::createTopology4WireFrame() {
 	if (sp.hasBottomFan()) {
+		//En horizontal.
 		for (int i = 1; i < pos_norm_bottomFan.size(); i++) {
 			i4WireFrame_bottomFan.push_back(i);
+		}
+		i4WireFrame_bottomFan.push_back(0xFFFF);
+		//Del centro hacia afuera.
+		for (int i = 1; i < pos_norm_bottomFan.size(); i++) {
+			i4WireFrame_bottomFan.push_back(0);
+			i4WireFrame_bottomFan.push_back(i);
+			i4WireFrame_bottomFan.push_back(0xFFFF);
 		}
 	}
 
 	if (sp.hasTopFan()) {
-		for (int i = 0; i < pos_norm_topFan.size() - 1; i++) {
+		//En horizontal
+		for (int i = 0; i < pos_norm_topFan.size() - 2; i++) {
 			i4WireFrame_topFan.push_back(i);
 		}
+		i4WireFrame_topFan.push_back(0xFFFF);
+		//Del centro hacia afuera.
+		for (int i = 0; i < pos_norm_topFan.size() - 2; i++) {
+			i4WireFrame_topFan.push_back(pos_norm_topFan.size() - 1);
+			i4WireFrame_bottomFan.push_back(i);
+			i4WireFrame_topFan.push_back(0xFFFF); //Puede que el último no deba ponerse.
+		}
+
 	}
 
 	if (sp.hasBody()) {

@@ -15,8 +15,15 @@ PagVAO::PagVAO()
 	ibo_wireFrame = 0;
 
 	numberOfIndices4Points = -1;
+	numberOfIndices4WF = -1;
 
-	createVAO();
+	if (createVAO()) {
+		createVBOPosNorm();
+		createVBOTangents();
+		createVBOTexCoord();
+	}
+
+	createIBO4PointCloud();
 
 }
 
@@ -25,18 +32,20 @@ PagVAO::~PagVAO()
 {
 }
 
-void PagVAO::createVAO() {
+bool PagVAO::createVAO() {
 	
 	if (vao <= 0) {
 		glGenVertexArrays(1, &vao);
 		if (vao == 0) {
 			std::cout << "Cannot create VAO: \n" << std::endl;
+			return false;
 		}
 	}
+	return true;
 }
 
 
-bool PagVAO::createVBOPosNorm() {
+void PagVAO::createVBOPosNorm() {
 
 	if (vao >= 0) {
 		// - Se activa el vao para este vbo.
@@ -63,17 +72,14 @@ bool PagVAO::createVBOPosNorm() {
 		glVertexAttribPointer(1, sizeof(glm::vec3) / sizeof(GLfloat),
 			GL_FLOAT, GL_FALSE, sizeof(PagPosNorm),
 			((GLubyte *)NULL + (sizeof(glm::vec3))));
-
-		return true;
 	}
 	else {
 		std::cout << "Cannot create VBO for this VAO \n" << std::endl;
-		return false;
 	}
 
 }
 
-bool PagVAO::createVBOTangents() {
+void PagVAO::createVBOTangents() {
 	if (vao >= 0) {
 		// - Se genera el VBO y se activa
 		glGenBuffers(1, &vbo_tangents);
@@ -85,15 +91,13 @@ bool PagVAO::createVBOTangents() {
 		glVertexAttribPointer(2, sizeof(glm::vec3) / sizeof(GLfloat),
 			GL_FLOAT, GL_FALSE, sizeof(glm::vec3),
 			((GLubyte *)NULL + (0)));
-		return true;
 	}
 	else {
 		std::cout << "Cannot create VBO for this VAO \n" << std::endl;
-		return false;
 	}
 }
 
-bool PagVAO::createVBOTexCoord() {
+void PagVAO::createVBOTexCoord() {
 	if (vao >= 0) {
 		// - Se genera el VBO y se activa
 		glGenBuffers(1, &vbo_texcoord);
@@ -105,13 +109,31 @@ bool PagVAO::createVBOTexCoord() {
 		glVertexAttribPointer(3, sizeof(glm::vec2) / sizeof(GLfloat),
 			GL_FLOAT, GL_FALSE, sizeof(glm::vec2),
 			((GLubyte *)NULL + (0)));
-		return true;
 	}
 	else {
 		std::cout << "Cannot create VBO for this VAO \n" << std::endl;
-		return false;
 	}
 }
+
+
+void PagVAO::createIBO4PointCloud() {
+	if (vao > 0) {
+		// - Se activa el vao para este ibo.
+		glBindVertexArray(vao);
+
+		// - Se crea el ibo.
+		glGenBuffers(1, &ibo_cloudPoint);
+	}
+	else {
+		std::cout << "Cannot create IBO for this VAO \n" << std::endl;
+	}
+}
+
+
+
+//
+//Métodos públicos
+//
 
 
 bool PagVAO::fillVBOPosNorm(std::vector<PagPosNorm> ppn) {
@@ -129,6 +151,7 @@ bool PagVAO::fillVBOPosNorm(std::vector<PagPosNorm> ppn) {
 	}
 	else {
 		std::cout << "Cannot fill positions and normals VBO" << std::endl;
+		return false;
 	}
 	
 }
@@ -167,22 +190,6 @@ bool PagVAO::fillVBOTexCoord(std::vector<glm::vec2> tc) {
 	}
 }
 
-bool PagVAO::createIBO4PointCloud() {
-	if (vao > 0) {
-		// - Se activa el vao para este ibo.
-		glBindVertexArray(vao);
-
-		// - Se crea el ibo.
-		glGenBuffers(1, &ibo_cloudPoint);
-
-		return true;
-	}
-	else {
-		std::cout << "Cannot create IBO for this VAO \n" << std::endl;
-		return false;
-	}
-}
-
 
 bool PagVAO::fillIBO4PointCloud(std::vector<GLuint> indices4Points) {
 
@@ -206,6 +213,27 @@ bool PagVAO::fillIBO4PointCloud(std::vector<GLuint> indices4Points) {
 		return false;
 	}
 
+}
+
+
+bool PagVAO::fillIBO4WireFrame(std::vector<GLuint> indices4WF) {
+	if (vao > 0) {
+		// - Se activa el vao para este vbo.
+		glBindVertexArray(vao);
+
+		// - Se activa el IBO que se quiere rellenar
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cloudPoint);
+
+		// - Se le pasa el array que contiene los índices
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices4WF.size() * sizeof(GLuint),
+			indices4WF.data(), GL_STATIC_DRAW);
+
+		numberOfIndices4Points = indices4WF.size();
+	}
+	else {
+		std::cout << "Cannot fill IBO for cloud points \n" << std::endl;
+		return false;
+	}
 }
 
 
