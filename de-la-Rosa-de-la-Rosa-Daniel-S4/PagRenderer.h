@@ -34,6 +34,7 @@ private:
 	static PagRenderer *instance;
 	PagShaderProgram pointShader;
 	PagShaderProgram wireFrameShader;
+	PagShaderProgram triangleShader;
 
 	glm::vec3 posCamera;
 	glm::vec3 lookAtCamera;

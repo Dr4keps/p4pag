@@ -19,12 +19,10 @@ public:
 	bool isValid();
 	bool has(PagRevObjParts part);
 	struct PagPosNorm* getPositionsAndNormals(PagRevObjParts part);
-	glm::vec3* getTangents(PagRevObjParts part);
-	glm::vec2* getTextureCoords(PagRevObjParts part);
-	GLuint* getIndices4PointCloud(PagRevObjParts part);
 	
-	void drawAsPointCloud(PagRevObjParts part);
-	void drawAsWireFrame(PagRevObjParts part);
+	void drawAsPoints(PagRevObjParts part);
+	void drawAsLines(PagRevObjParts part);
+	void drawAsTriangles(PagRevObjParts part);
 
 private:
 	void createTopology4PointCloud();

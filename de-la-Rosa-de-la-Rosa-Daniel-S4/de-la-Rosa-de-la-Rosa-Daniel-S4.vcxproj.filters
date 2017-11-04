@@ -70,5 +70,11 @@
     <None Include="wireFrameShader-vert.glsl">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include="triangleShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="triangleShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>

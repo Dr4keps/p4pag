@@ -171,6 +171,8 @@
   <ItemGroup>
     <None Include="pointShader-frag.glsl" />
     <None Include="pointShader-vert.glsl" />
+    <None Include="triangleShader-frag.glsl" />
+    <None Include="triangleShader-vert.glsl" />
     <None Include="wireFrameShader-frag.glsl" />
     <None Include="wireFrameShader-vert.glsl" />
   </ItemGroup>

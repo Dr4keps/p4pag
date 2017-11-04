@@ -18,16 +18,18 @@ public:
 
 	bool fillIBO4PointCloud(std::vector<GLuint> indices4Points);
 	bool fillIBO4WireFrame(std::vector<GLuint> indices4WF);
-
+	bool fillIBO4Triangles(std::vector<GLuint> indices4Triangles);
 
 	void drawAsPointCloud();
 	void drawAsWireFrame();
+	void drawAsTriangles(bool tapa);
 
 private: 
 	GLuint vao;
 
 	GLsizei numberOfIndices4Points;
 	GLsizei numberOfIndices4WF;
+	GLsizei numberOfIndices4Triangles;
 
 	GLuint vbo_posnorm;
 	GLuint vbo_tangents;
@@ -45,5 +47,6 @@ private:
 
 	void createIBO4PointCloud();
 	void createIBO4WireFrame();
+	void createIBO4Triangles();
 };
 

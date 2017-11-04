@@ -214,13 +214,15 @@ PagRevolutionObject::PagRevolutionObject(std::vector<glm::vec2> points, unsigned
 	//Rellenamos IBOs.
 	vaoBody.fillIBO4PointCloud(i4PointCloud_body);
 	vaoBody.fillIBO4WireFrame(i4WireFrame_body);
-	//fillIBO4TriangleMesh(i4TriangleMesh_body);
+	vaoBody.fillIBO4Triangles(i4TriangleMesh_body);
 
 	vaoBottomFan.fillIBO4PointCloud(i4PointCloud_bottomFan);
 	vaoBottomFan.fillIBO4WireFrame(i4WireFrame_bottomFan);
+	vaoBottomFan.fillIBO4Triangles(i4TriangleMesh_bottomFan);
 	
 	vaoTopFan.fillIBO4PointCloud(i4PointCloud_topFan);
 	vaoTopFan.fillIBO4WireFrame(i4WireFrame_topFan);
+	vaoTopFan.fillIBO4Triangles(i4TriangleMesh_topFan);
 
 }
 
@@ -322,8 +324,8 @@ void PagRevolutionObject::createTopology4TriangleMesh() {
 	if (sp.hasBottomFan()) {
 		for (int i = 1; i < pos_norm_bottomFan.size() - 1; i++) {
 			i4TriangleMesh_bottomFan.push_back(0);
-			i4TriangleMesh_bottomFan.push_back(i);
 			i4TriangleMesh_bottomFan.push_back(i + 1);
+			i4TriangleMesh_bottomFan.push_back(i);
 		}
 	}
 
@@ -402,91 +404,8 @@ PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
 	return nullptr;
 }
 
-//Devuelve un array de C++ con las tangentes de los puntos correspondientes
-//a la parte que se le pasa.
-glm::vec3 * PagRevolutionObject::getTangents(PagRevObjParts part)
-{
-
-	if ((part == PAG_BODY) && (sp.hasBody())) {
-		return tangents_body.data();
-	}
-
-	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		return tangents_topFan.data();
-	}
-
-	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		return tangents_bottomFan.data();
-	}
-
-	return nullptr;
-}
-
-//Devuelve un array de C++ con las coordenadas de textura de cada vértice
-//de la parte del objeto que se pasa como argumento. 
-glm::vec2 * PagRevolutionObject::getTextureCoords(PagRevObjParts part)
-{
-
-	if ((part == PAG_BODY) && (sp.hasBody())) {
-		for (int i = 0; i < texcoord_body.size(); i++) {
-			std::cout << "Coord. textura: (" << texcoord_body[i].x << ", " << texcoord_body[i].y << ")" << std::endl;
-		}
-		return texcoord_body.data();
-	}
-
-	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		for (int i = 0; i < texcoord_topFan.size(); i++) {
-			std::cout << "Coord. textura: (" << texcoord_topFan[i].x << ", " << texcoord_topFan[i].y << ")" << std::endl;
-		}
-		return texcoord_topFan.data();
-	}
-
-	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		for (int i = 0; i < texcoord_bottomFan.size(); i++) {
-			std::cout << "Coord. textura: (" << texcoord_bottomFan[i].x << ", " << texcoord_bottomFan[i].y << ")" << std::endl;
-		}
-		return texcoord_bottomFan.data();
-	}
-
-	return nullptr;
-}
-
-
-GLuint* PagRevolutionObject::getIndices4PointCloud(PagRevObjParts part)
-{
-
-	if ((part == PAG_BODY) && (sp.hasBody())) {
-		std::cout << "Indices4PointCloud cuerpo: " << std::endl;
-		for (int i = 0; i < i4WireFrame_body.size(); i++) {
-			std::cout << "- " << i4WireFrame_body[i] << " -" << std::endl;
-		}
-		
-		return i4PointCloud_body.data();
-	}
-
-	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		std::cout << "Indices4PointCloud tapa arriba: " << std::endl;
-		for (int i = 0; i < i4PointCloud_topFan.size(); i++) {
-			std::cout << "- " << i4PointCloud_topFan[i] << " -" << std::endl;
-		}
-
-		return i4PointCloud_topFan.data();
-	}
-
-	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		std::cout << "Indices4PointCloud tapa abajo: " << std::endl;
-		for (int i = 0; i < i4WireFrame_bottomFan.size(); i++) {
-			std::cout << "- " << i4WireFrame_bottomFan[i] << " -" << std::endl;
-		}
-
-		return i4PointCloud_bottomFan.data();
-	}
-
-	return nullptr;
-}
-
-
-void PagRevolutionObject::drawAsPointCloud(PagRevObjParts part) {
+//Métodos de dibujo. Delegan en la clase PagVAO para dibujar.
+void PagRevolutionObject::drawAsPoints(PagRevObjParts part) {
 	
 	switch (part) {
 	case PAG_BODY:
@@ -502,7 +421,7 @@ void PagRevolutionObject::drawAsPointCloud(PagRevObjParts part) {
 }
 
 
-void PagRevolutionObject::drawAsWireFrame(PagRevObjParts part)
+void PagRevolutionObject::drawAsLines(PagRevObjParts part)
 {
 	switch (part) {
 	case PAG_BODY:
@@ -513,6 +432,21 @@ void PagRevolutionObject::drawAsWireFrame(PagRevObjParts part)
 		break;
 	case PAG_TOP_FAN:
 		vaoTopFan.drawAsWireFrame();
+		break;
+	}
+}
+
+
+void PagRevolutionObject::drawAsTriangles(PagRevObjParts part) {
+	switch (part) {
+	case PAG_BODY:
+		vaoBody.drawAsTriangles(false);
+		break;
+	case PAG_BOTTOM_FAN:
+		vaoBottomFan.drawAsTriangles(true);
+		break;
+	case PAG_TOP_FAN:
+		vaoTopFan.drawAsTriangles(true);
 		break;
 	}
 }

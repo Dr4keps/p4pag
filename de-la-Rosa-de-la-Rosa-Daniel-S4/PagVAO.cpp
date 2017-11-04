@@ -16,6 +16,7 @@ PagVAO::PagVAO()
 
 	numberOfIndices4Points = -1;
 	numberOfIndices4WF = -1;
+	numberOfIndices4Triangles = -1;
 
 	if (createVAO()) {
 		createVBOPosNorm();
@@ -24,6 +25,7 @@ PagVAO::PagVAO()
 
 		createIBO4PointCloud();
 		createIBO4WireFrame();
+		createIBO4Triangles();
 	}
 
 	
@@ -153,6 +155,20 @@ void PagVAO::createIBO4WireFrame() {
 }
 
 
+void PagVAO::createIBO4Triangles() {
+	if (vao > 0) {
+		// - Se activa el vao para este ibo.
+		glBindVertexArray(vao);
+
+		// - Se crea el ibo.
+		glGenBuffers(1, &ibo_triangles);
+	}
+	else {
+		std::cout << "Cannot create IBO for this VAO \n" << std::endl;
+	}
+}
+
+
 
 //
 //Métodos públicos
@@ -262,6 +278,31 @@ bool PagVAO::fillIBO4WireFrame(std::vector<GLuint> indices4WF) {
 }
 
 
+bool PagVAO::fillIBO4Triangles(std::vector<GLuint> indices4Triangles) {
+	if (vao > 0) {
+		// - Se activa el vao para este vbo.
+		glBindVertexArray(vao);
+
+		// - Se activa el IBO que se quiere rellenar
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangles);
+
+		// - Se le pasa el array que contiene los índices
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices4Triangles.size() * sizeof(GLuint),
+			indices4Triangles.data(), GL_STATIC_DRAW);
+
+		//Se guarda el número de índices.
+		numberOfIndices4Triangles = indices4Triangles.size();
+
+		return true;
+	}
+	else {
+		std::cout << "Cannot fill IBO for cloud points \n" << std::endl;
+		return false;
+	}
+}
+
+
+//Métodos de dibujo.
 void PagVAO::drawAsPointCloud() {
 	// - Se activa el VAO
 	glBindVertexArray(vao);
@@ -284,4 +325,21 @@ void PagVAO::drawAsWireFrame() {
 
 	// - Se dibuja la malla
 	glDrawElements(GL_LINE_STRIP, numberOfIndices4WF, GL_UNSIGNED_INT, NULL);
+}
+
+
+void PagVAO::drawAsTriangles(bool tapa) {
+	// - Se activa el VAO
+	glBindVertexArray(vao);
+
+	// - Se activa el IBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_triangles);
+
+	// - Se dibuja la malla
+	if (tapa) {
+		glDrawElements(GL_TRIANGLE_FAN, numberOfIndices4Triangles, GL_UNSIGNED_INT, NULL);
+	}
+	else {
+		glDrawElements(GL_TRIANGLE_STRIP, numberOfIndices4Triangles, GL_UNSIGNED_INT, NULL);
+	}
 }
