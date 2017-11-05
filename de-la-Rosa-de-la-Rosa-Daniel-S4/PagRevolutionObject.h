@@ -1,7 +1,6 @@
 #pragma once
 #include <glm.hpp>
 #include <vector>
-#include <iostream>
 #include "PagSubdivisionProfile.h"
 #include "PagEnumerations.h"
 #include "PagStructures.h"

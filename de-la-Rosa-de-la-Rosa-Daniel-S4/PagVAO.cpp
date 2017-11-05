@@ -28,8 +28,6 @@ PagVAO::PagVAO()
 		createIBO4Triangles();
 	}
 
-	
-
 }
 
 
@@ -174,7 +172,6 @@ void PagVAO::createIBO4Triangles() {
 //Métodos públicos
 //
 
-
 bool PagVAO::fillVBOPosNorm(std::vector<PagPosNorm> ppn) {
 
 	if (vao > 0 && vbo_posnorm > 0) {
@@ -301,8 +298,9 @@ bool PagVAO::fillIBO4Triangles(std::vector<GLuint> indices4Triangles) {
 	}
 }
 
-
+//
 //Métodos de dibujo.
+//
 void PagVAO::drawAsPointCloud() {
 	// - Se activa el VAO
 	glBindVertexArray(vao);

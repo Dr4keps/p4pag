@@ -285,16 +285,16 @@ void PagRevolutionObject::createTopology4WireFrame() {
 		for (int i = 0; i < pos_norm_topFan.size() - 2; i++) {
 			i4WireFrame_topFan.push_back(pos_norm_topFan.size() - 1);
 			i4WireFrame_topFan.push_back(i);
-			i4WireFrame_topFan.push_back(0xFFFF); //Puede que el último no deba ponerse.
+			i4WireFrame_topFan.push_back(0xFFFF);
 		}
 
 	}
 
 	if (sp.hasBody()) {
 		int pisos = sp.getPoints().size();
+		//pisos contiene el número de pisos del cuerpo del objeto de revolución.
 		if (sp.hasBottomFan())
 			pisos--;
-		//pisos contiene el número de pisos del cuerpo del objeto de revolución.
 		if (sp.hasTopFan())
 			pisos--;
 
@@ -317,7 +317,7 @@ void PagRevolutionObject::createTopology4WireFrame() {
 
 }
 
-//PROBAR (creo que bien)
+
 //Rellena los vectores de índices para dibujar como modelo de alambre.
 void PagRevolutionObject::createTopology4TriangleMesh() {
 
@@ -373,38 +373,10 @@ bool PagRevolutionObject::has(PagRevObjParts part)
 	return false;
 }
 
-//Devuelve posiciones y normales de los puntos correspondiente a la PagRevObjParts
-//que se le pasa como argumento.
-PagPosNorm * PagRevolutionObject::getPositionsAndNormals(PagRevObjParts part)
-{
-	if ((part == PAG_BODY) && (sp.hasBody())) {
-		for (int i = 0; i < pos_norm_body.size(); i++) {
-			std::cout <<i<<" -> " <<"Posición (" << pos_norm_body[i].position.x << ", " << pos_norm_body[i].position.y << ", " << pos_norm_body[i].position.z << "). ";
-			std::cout << "Normal (" << pos_norm_body[i].normal.x << ", " << pos_norm_body[i].normal.y << ", " << pos_norm_body[i].normal.z << ")." << std::endl;
-		}
-		return pos_norm_body.data();
-	}
-
-	if ((part == PAG_TOP_FAN) && (sp.hasTopFan())) {
-		for (int i = 0; i < pos_norm_topFan.size(); i++) {
-			std::cout << i << " -> " << "Posición (" << pos_norm_topFan[i].position.x << ", " << pos_norm_topFan[i].position.y << ", " << pos_norm_topFan[i].position.z << "). ";
-			std::cout << "Normal (" << pos_norm_topFan[i].normal.x << ", " << pos_norm_topFan[i].normal.y << ", " << pos_norm_topFan[i].normal.z << ")." << std::endl;
-		}
-		return pos_norm_topFan.data();
-	}
-
-	if ((part == PAG_BOTTOM_FAN) && (sp.hasBottomFan())) {
-		for (int i = 0; i < pos_norm_bottomFan.size(); i++) {
-			std::cout << i << " -> " << "Posición (" << pos_norm_bottomFan[i].position.x << ", " << pos_norm_bottomFan[i].position.y << ", " << pos_norm_bottomFan[i].position.z << "). ";
-			std::cout << "Normal (" << pos_norm_bottomFan[i].normal.x << ", " << pos_norm_bottomFan[i].normal.y << ", " << pos_norm_bottomFan[i].normal.z << ")." << std::endl;;
-		}
-		return pos_norm_bottomFan.data();
-	}
-
-	return nullptr;
-}
 
 //Métodos de dibujo. Delegan en la clase PagVAO para dibujar.
+
+//Dibuja en forma de puntos la parte del objeto que se pase como argumento.
 void PagRevolutionObject::drawAsPoints(PagRevObjParts part) {
 	
 	switch (part) {
@@ -420,7 +392,7 @@ void PagRevolutionObject::drawAsPoints(PagRevObjParts part) {
 	}
 }
 
-
+//Dibuja en forma de líneas la parte del objeto que se pase como argumento.
 void PagRevolutionObject::drawAsLines(PagRevObjParts part)
 {
 	switch (part) {
@@ -436,7 +408,7 @@ void PagRevolutionObject::drawAsLines(PagRevObjParts part)
 	}
 }
 
-
+//Dibuja en forma de malla de triángulos la parte del objeto que se pase como argumento.
 void PagRevolutionObject::drawAsTriangles(PagRevObjParts part) {
 	switch (part) {
 	case PAG_BODY:
@@ -450,3 +422,4 @@ void PagRevolutionObject::drawAsTriangles(PagRevObjParts part) {
 		break;
 	}
 }
+

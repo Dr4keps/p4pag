@@ -32,6 +32,9 @@ private:
 	PagRenderer();
 
 	static PagRenderer *instance;
+
+	PagRevolutionObject* revolutionObj;
+
 	PagShaderProgram pointShader;
 	PagShaderProgram wireFrameShader;
 	PagShaderProgram triangleShader;
